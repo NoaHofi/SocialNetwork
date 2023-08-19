@@ -1,35 +1,112 @@
-const fs = require('fs');
-const path = require('path');
+const knex = require('./knex'); // Import the knex connection from the knex.js file
 
-const adminSettingsPath = path.join(__dirname, 'data', 'adminSettings.json');
-const activityLogPath = path.join(__dirname, 'data', 'activityLog.json');
+(async () => {
+  const tableExists = await knex.schema.hasTable('pages');
 
-// Function to Get Admin Settings
-function getAdminSettings() {
-  const adminSettings = fs.readFileSync(adminSettingsPath, 'utf-8');
-  return JSON.parse(adminSettings);
+  if (!tableExists) {
+    // Create a new 'pages' table
+    await knex.schema.createTable('pages', (table) => {
+      table.increments('pageID').primary();
+      table.string('pageName').notNullable().unique();
+      table.boolean('enabled').notNullable();
+    });
+    console.log('Pages table created.');
+  }
+
+  const fetatureTableExists = await knex.schema.hasTable('features');
+
+  if (!fetatureTableExists) {
+    // Create a new 'features' table
+    await knex.schema.createTable('features', (table) => {
+      table.increments('featureID').primary();
+      table.string('featureName').notNullable().unique();
+      table.boolean('enabled').notNullable();
+    });
+    console.log('features table created.');
+  }
+
+  activityTableExists = await knex.schema.hasTable('activityLog');
+
+  if (!activityTableExists) {
+    // Create a new 'activityLog' table
+    await knex.schema.createTable('activityLog', (table) => {
+      table.increments('activityID').primary();
+      table.string('activityAction').notNullable();
+      table.timestamp('timeStamp').defaultTo(knex.fn.now()); // Use timestamp type and default value
+    });
+    console.log('activityLog table created.');
+  }
+
+})();
+
+
+async function updatePageStatus(pageID, isEnabled) {
+  try {
+    await knex('pages')
+      .where('pageID', pageID)
+      .update({ enabled: isEnabled });
+      console.log(`page updated with ID: ${pageID} to status ${isEnabled}`);
+  } catch (error) {
+    throw new Error('Failed to update page status in the database.');
+  }
 }
 
-// Function to Save Admin Settings
-function saveAdminSettings(adminSettings) {
-  fs.writeFileSync(adminSettingsPath, JSON.stringify(adminSettings, null, 2));
+async function getAdditionalPages() {
+  try {
+    const pages = await knex('pages').select('pagaID','pageName','enabled');
+    return pages;
+  } catch (error) {
+    throw new Error('Failed to get additional pages status from the database.');
+  }
 }
 
-// Function to Get Activity Log
-function getActivityLog() {
-  const activityLog = fs.readFileSync(activityLogPath, 'utf-8');
-  return JSON.parse(activityLog);
+
+async function updateFeatureStatus(featureID, isEnabled) {
+  try {
+    await knex('features')
+      .where('featureID', featureID)
+      .update({ enabled: isEnabled });
+  } catch (error) {
+    throw new Error('Failed to update feature status in the database.');
+  }
 }
 
-// Function to Save Activity Log
-function saveActivityLog(activityLog) {
-  fs.writeFileSync(activityLogPath, JSON.stringify(activityLog, null, 2));
+async function getAdditionalFeatures() {
+  try {
+    const features = await knex('features').select('featureID','featureName','enabled');
+    return features;
+  } catch (error) {
+    throw new Error('Failed to get additional features status from the database.');
+  }
+}
+
+async function getAllActivityLog() {
+  try {
+    activities = await knex('activityLog').select('activityID','activityAction','timeStamp');
+    return activities;
+  } catch (error) {
+    throw new Error('Failed to get all activities from the database.');
+  }
+}
+
+async function insertActivity(activityAction) {
+  try {
+    await knex('activityLog').insert({
+      activityAction: activityAction,
+    });
+    console.log(`activity added to DB: ${activityAction} `)
+  } catch (error) {
+    console.error('Error inserting activity:', error);
+    throw new Error('Failed to insert activity into the database.');
+  }
 }
 
 
 module.exports = {
-    getAdminSettings,
-    saveAdminSettings,
-    getActivityLog,
-    saveActivityLog,
-  };
+  updatePageStatus,
+  updateFeatureStatus,
+  getAdditionalPages,
+  getAdditionalFeatures,
+  getAllActivityLog,
+  insertActivity
+};
