@@ -1,5 +1,6 @@
 
 const knex = require('./knex'); // Import the knex connection from the knex.js file
+const admin = require('./admin');
 
 (async () => {
   const tableExists = await knex.schema.hasTable('users');
@@ -17,7 +18,7 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
 })();
 
 
-async function searchUser(username_prefix) {
+async function searchUserByPrefix(username_prefix) {
   try {
     const users = await knex('users')
       .select('userID', 'username')
@@ -34,7 +35,6 @@ async function searchUser(username_prefix) {
 async function isUserExist(username) {
   try {
     console.log(`username: ${username}`);
-    console.log("getUserByUsername");
     const user = await knex('users')
       .select('*')
       .where('username', username)
@@ -44,7 +44,7 @@ async function isUserExist(username) {
     console.log(`isExist: ${isExist}`);
     return isExist;
   } catch (error) {
-    console.error('Error in getUserByUsername:', error);
+    console.error('Error in isUserExist:', error);
     throw error;
   }
 }
@@ -105,11 +105,63 @@ async function login(username, password) {
         .where('username', username)
         .update('isLogin', true);
     });
-
+    admin.insertActivity(`User ${username} successfully login`)
     return true; // Login successful
   } catch (err) {
     console.error('Error during login:', err.message);
     throw new Error('Login failed.');
+  }
+}
+
+async function logout(username) {
+  try {
+    const user = await knex
+      .select('*')
+      .from('users')
+      .where('username', username)
+      .first();
+
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    // Update isLogin to false in a transaction
+    await knex.transaction(async (trx) => {
+      await trx('users')
+        .where('username', username)
+        .update('isLogin', false);
+    });
+    admin.insertActivity(`User ${username} successfully logged out`);
+    return true; // Logout successful
+  } catch (err) {
+    console.error('Error during logout:', err.message);
+    throw new Error('Logout failed.');
+  }
+}
+
+async function removeUserFromDB(username) {
+  try {
+    // Delete the user
+    await knex('users').where('username', username).del();
+  } catch (error) {
+    console.error('Error removing user from the database:', error);
+    throw new Error('Failed to remove user from the database.');
+  }
+}
+
+async function isUserLoggedIn(username){
+  try {
+    console.log(`username: ${username}`);
+    const isLogin = await knex('users')
+      .select('islogin')
+      .where('username', username)
+      .first();
+    
+    console.log(`isLoggedin: ${isLogin}`);
+    return isLogin;
+  } catch (error) {
+    console.error('Error in isLogin:', error);
+    throw error;
   }
 }
 
@@ -118,6 +170,10 @@ module.exports = {
   insertUser,
   isUserExist,
   login,
-  searchUser
+  searchUserByPrefix,
+  removeUserFromDB,
+  logout,
+  isUserLoggedIn
+
 };
   

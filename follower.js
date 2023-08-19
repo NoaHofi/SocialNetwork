@@ -57,13 +57,13 @@ async function unFollow(userID, followBy) {
 async function getFollowers(userID) {
   try {
     const followers  = await knex('follower')
-      .select('username')
+      .select('userID')
       .where({
         followBy: userID,
       }); 
 
     console.log('Follower data deleted for user:', userID);
-    return numDeleted; // Return the number of deleted rows
+    return followers; // Return the number of deleted rows
   } catch (error) {
     console.error('Error getting followers:', error);
     throw error;
