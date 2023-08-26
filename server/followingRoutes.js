@@ -60,4 +60,26 @@ Router.post('/unfollow', async (req, res) => {
 });
 
 
+Router.get('/allUsers', async (req, res) => {
+  try {
+    const users = await getAllUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+// The checkFollowing endpoint is optional and depends on your use case
+Router.get('/checkFollowing/:loggedInUserID/:targetUserID', async (req, res) => {
+  try {
+    const { loggedInUserID, targetUserID } = req.params;
+    const isFollowing = await followers.checkFollowing(loggedInUserID, targetUserID);
+    res.status(200).json({ isFollowing });
+  } catch (error) {
+    console.error('Error checking follow status:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
 module.exports = Router;

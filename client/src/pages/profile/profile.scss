@@ -1,123 +1,103 @@
 @import "../../style.scss";
 
 .profile {
-  @include themify($themes) {
-    background-color: themed("bgSoft");
+  @import "../../style.scss";
 
-    .images {
-      width: 100%;
-      height: 300px;
-      position: relative;
-
-      .cover {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .profilePic {
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        object-fit: cover;
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: auto;
-        top: 200px;
-      }
-    }
-    .profileContainer {
-      padding: 20px 70px;
-
+  .rightBar {
+    @include themify($themes) {
+      flex: 3;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+      overflow: scroll;
+      background-color: themed("bgSoft");
+  
       @include mobile{
-        padding: 10px;
+        display: none;
       }
-
       @include tablet{
-        padding: 20px;
+        display: none;
       }
-
-      .uInfo {
-        height: 180px;
-        -webkit-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        -moz-box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        box-shadow: 0px 0px 25px -10px rgba(0, 0, 0, 0.38);
-        border-radius: 20px;
-        background-color: themed("bg");
-        color: themed("textColor");
-        padding: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-
-        @include mobile{
-          flex-direction: column;
-          height: 30vh;
+  
+      &::-webkit-scrollbar {
+        display: none;
+      }
+  
+      .container {
+        padding: 20px;
+  
+        .item {
+          -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+          -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+          box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
           padding: 20px;
-          margin-top: 100px;
-        }
-
-        .left {
-          flex: 1;
-          display: flex;
-          gap: 10px;
-
-          @include tablet{
-            flex-wrap: wrap;
-          }
-
-          a{
-            color: themed("textColorSoft");
-          }
-        }
-
-        .center {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-
+          margin-bottom: 20px;
+          background-color: themed("bg");
+  
           span {
-            font-size: 30px;
-            font-weight: 500;
+            color: gray;
           }
-
-          .info {
-            width: 100%;
+  
+          .user {
             display: flex;
             align-items: center;
-            justify-content: space-around;
-
-            .item {
+            justify-content: space-between;
+            margin: 20px 0px;
+  
+            .userInfo {
               display: flex;
               align-items: center;
-              gap: 5px;
-              color: themed("textColorSoft");
-
+              gap: 20px;
+              position: relative;
+  
+              img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+              }
+  
+              .online {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: limegreen;
+                position: absolute;
+                top: 0;
+                left: 30px;
+              }
+  
+              p {
+                color: themed("textColorSoft");
+              }
+  
               span {
-                font-size: 12px;
+                font-weight: 500;
+                color: themed("textColor");
+              }
+            }
+  
+            .buttons {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+  
+              button {
+                border: none;
+                padding: 5px;
+                color: white;
+                cursor: pointer;
+  
+                &:first-child {
+                  background-color: #5271ff;
+                }
+  
+                &:last-child {
+                  background-color: #f0544f;
+                }
               }
             }
           }
-          button {
-            border: none;
-            background-color: #5271ff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-          }
-        }
-
-        .right {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 10px;
         }
       }
     }

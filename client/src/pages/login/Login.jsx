@@ -55,6 +55,14 @@ const handleChange = (e) => {
             <input type="text" placeholder="Username" name="username" onChange={handleChange}/>
             <input type="password" placeholder="Password" name="password" onChange={handleChange}/>
             {err && err}
+            <label>
+            <input 
+              type="checkbox" 
+              name="rememberMe" 
+              onChange={e => setInputs(prev => ({ ...prev, rememberMe: e.target.checked }))}
+            />
+            Remember me
+          </label>
             <button onClick={handleLogin}>Login</button>
           </form>
         </div>

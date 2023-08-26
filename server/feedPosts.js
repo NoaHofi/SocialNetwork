@@ -32,18 +32,29 @@ const admin = require('./admin');
 // Get all the post that made by the people the userID follow sorted by insertion time
 async function getPostData(userID) {
   try {
-    const posts = await knex('posts')
-      .join('follower', 'posts.userID', '=', 'follower.followBy')
-      .select('posts.postID', 'posts.postData', 'posts.createdAt')
-      .where('follower.userID', userID)
-      .orderBy('posts.createdAt', 'desc'); // Order by insertion time in descending order
+      // Fetch the IDs of users this user is following
+      const followedIDs = await knex('follower')
+          .where('follower.userID', userID)
+          .select('followBy');
 
-    return posts;
+      // Extract IDs and add the user's own ID
+      const userIDs = followedIDs.map(follow => follow.followBy);
+      userIDs.push(userID);
+
+      // Now fetch the posts using the IDs list
+      const posts = await knex('posts')
+          .join('users', 'users.userID', '=', 'posts.userID')
+          .select('posts.postID', 'posts.postData', 'posts.createdAt', 'posts.userID', 'users.username')
+          .whereIn('posts.userID', userIDs)
+          .orderBy('posts.createdAt', 'desc'); // Order by insertion time in descending order
+
+      return posts;
   } catch (error) {
-    console.error('Error getting posts:', error);
-    throw error;
+      console.error('Error getting posts:', error);
+      throw error;
   }
 }
+
 
 // Function to Save Post Data
 async function savePostData(userID,postData) {
@@ -63,7 +74,7 @@ async function savePostData(userID,postData) {
   }
 }
 
-async function editPostData(postID) {
+async function editPostData(postID,newPostData) {
   try {
     await knex('posts')
       .where('postID', postID)

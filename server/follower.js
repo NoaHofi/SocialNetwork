@@ -23,6 +23,7 @@ async function follow(userID, followBy) {
     });
 
     console.log('Follower data saved with ID:', followerId);
+    console.log(`user id:${userID} is followd by ${followBy}`)
     return followerId;
   } catch (error) {
     console.error('Error following user:', error);
@@ -62,7 +63,7 @@ async function getFollowers(userID) {
         followBy: userID,
       }); 
 
-    console.log('Follower data deleted for user:', userID);
+    console.log('get followers for user', userID);
     return followers; // Return the number of deleted rows
   } catch (error) {
     console.error('Error getting followers:', error);
@@ -70,9 +71,23 @@ async function getFollowers(userID) {
   }
 }
 
+const getAllUsers = async () => {
+  return knex('users').select('userID', 'username');
+};
+
+async function checkFollowing(loggedInUserID, targetUserID) {
+  const result = await knex('follower').where({
+    userID: targetUserID,
+    followBy: loggedInUserID
+  }).first();
+
+  return !!result; // returns true if following, otherwise false
+};
 
 module.exports = {
   follow,
   unFollow,
-  getFollowers
+  getFollowers,
+  checkFollowing,
+  getAllUsers,
 };

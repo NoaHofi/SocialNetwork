@@ -1,7 +1,7 @@
 const Router = require("express").Router();
 const posts = require('./feedPosts');
 const jws = require('jws');
-
+const jwt = require('jsonwebtoken');
 // Create Post
 Router.post('/createPost',async (req, res) => {
   const { userID , postData } = req.body;
@@ -33,28 +33,28 @@ Router.get('/getAllPosts', async (req, res) => {
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("Not logged in!")
   console.log(token)
+  try {
+    const userInfo = jwt.verify(token, "secretkey");
 
-   jws.verify(token, "HS256", "secretkey", (err,userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!")
-    console.log(userInfo.id)
-    try {
-      //const postData = await posts.getPostData(userInfo.id); // Use await since savePostData is an async function
-      //console.log(postData)
-      //res.status(201).json({postData });
-      es.status(201).json({"jfjffjffk":"ffff" });
-    } catch (error) {
-      console.error('Error during Get Post:', error);
-      res.status(500).json({ message: 'Internal server error.' });
+    console.log(userInfo.id);
+    const postData = await posts.getPostData(userInfo.id);
+    res.status(201).json({ postData });
+} catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+        console.error('Token verification failed:', error);
+        return res.status(403).json({ message: "Token is not valid!", error: error.message });
     }
-  })
- 
+    console.error('Error during Get Post:', error);
+    res.status(500).json({ message: 'Internal server error.', error: error.message });
+}
 });
 
 // Edit Post
 Router.put('/editPost/:postId', async (req, res) => {
   const { postId } = req.params; // Extract postId from URL parameter
   const { newPostData } = req.body; // Extract newPostData from request body
-
+  console.log(postId)
+  console.log(newPostData)
   try {
     if (!newPostData) {
       return res.status(400).json({ message: 'New post data is required.' });

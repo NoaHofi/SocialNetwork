@@ -1,59 +1,94 @@
+import React, { useEffect, useState, useRef } from 'react';
 import "./post.scss";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
-import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
-import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { Link } from "react-router-dom";
-import Comments from "../comments/Comments";
-import { useState } from "react";
+import { makeRequest } from "../../axios";  // Assuming you have this axios config
 
 const Post = ({ post }) => {
-  const [commentOpen, setCommentOpen] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedPostText, setEditedPostText] = useState(post.postData);
+  const editInputRef = useRef(null);
+  const [isUserFetched, setIsUserFetched] = useState(false);
 
-  //TEMPORARY
-  const liked = false;
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await makeRequest.get('/userLogin/getLoggedInUser');
+        setLoggedInUser(response.data);
+      } catch (error) {
+        console.error('Error fetching the logged-in user:', error);
+      } finally {
+        // This will be called after trying to fetch the user,
+        // regardless of success or failure
+        setIsUserFetched(true);
+      }
+    }
+    fetchUser();
+  }, []);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    editInputRef.current.focus();
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      console.log(editedPostText)
+      const response = await makeRequest.put(`/post/editPost/${post.postID}`, {
+        newPostData: editedPostText
+      });
+      if (response.status === 200) {
+        console.log(response.data.message);
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error('Error editing the post:', error);
+    }
+  };
 
   return (
     <div className="post">
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img src={post.profilePic} alt="" />
             <div className="details">
-              <Link
-                to={`/profile/${post.userId}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <span className="name">{post.name}</span>
-              </Link>
-              <span className="date">1 min ago</span>
+              <span className="date">{post.createAt}</span>
             </div>
           </div>
-          <MoreHorizIcon />
+          {
+            loggedInUser ? (
+              loggedInUser.userID === post.userID && (
+                isEditing ? (
+                  <div className="editContainer">
+                    <input
+                      ref={editInputRef}
+                      value={editedPostText}
+                      onChange={(e) => setEditedPostText(e.target.value)}
+                      className="editInput"
+                    />
+                    <button onClick={handleSaveEdit} className="saveButton">Save</button>
+                  </div>
+                ) : (
+                  <MoreHorizIcon onClick={handleEditClick} />
+                )
+              )
+            ) : "loading"
+          }
         </div>
         <div className="content">
-          <p>{post.desc}</p>
-          <img src={post.img} alt="" />
+          <h4>{post.username}</h4> {/* Display the username */}
+          {!isEditing && <p>{post.postData}</p>}
         </div>
         <div className="info">
           <div className="item">
-            {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
+            {/* Your like icons and other features can be placed here */}
             12 Likes
           </div>
-          <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
-            <TextsmsOutlinedIcon />
-            12 Comments
-          </div>
-          <div className="item">
-            <ShareOutlinedIcon />
-            Share
-          </div>
         </div>
-        {commentOpen && <Comments />}
       </div>
     </div>
-  );
+);
 };
 
 export default Post;

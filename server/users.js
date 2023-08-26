@@ -23,7 +23,8 @@ async function searchUserByPrefix(username_prefix) {
     const users = await knex('users')
       .select('userID', 'username')
       .where('username', 'like', `${username_prefix}%`);
-
+      console.log(users);
+      
     return users;
   } catch (error) {
     console.error('Error in searchUser:', error);
@@ -165,6 +166,25 @@ async function isUserLoggedIn(username){
   }
 }
 
+async function getUsernameByUserID(userID){
+  try {
+    const user = await knex('users')
+        .select('username')
+        .where({ userID: userID })
+        .first();
+
+    if (!user) {
+        throw new Error(`No user found with userID: ${userID}`);
+    }
+
+    return user.username;
+  } catch (error) {
+      console.error('Error fetching username:', error);
+      throw error;
+  }
+}
+
+
 module.exports = {
   getUserByUsername,
   insertUser,
@@ -173,7 +193,8 @@ module.exports = {
   searchUserByPrefix,
   removeUserFromDB,
   logout,
-  isUserLoggedIn
+  isUserLoggedIn,
+  getUsernameByUserID
 
 };
   

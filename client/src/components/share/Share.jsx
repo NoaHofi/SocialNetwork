@@ -1,27 +1,66 @@
+import React, { useContext, useState, useRef,useEffect } from 'react';
 import "./share.scss";
 import Image from "../../assets/img.png";
 import Map from "../../assets/map.png";
 import Friend from "../../assets/friend.png";
-import { useContext } from "react";
+import { makeRequest } from "../../axios";
 import { AuthContext } from "../../context/authContext";
 
 const Share = () => {
+  const { currentUser } = useContext(AuthContext);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [postText, setPostText] = useState('');
+  const fileInputRef = useRef(null);
 
-  const {currentUser} = useContext(AuthContext)
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await makeRequest.get('/userLogin/getLoggedInUser');
+        setLoggedInUser(response.data);
+        console.log(loggedInUser)
+      } catch (error) {
+        console.error('Error fetching the logged-in user:', error);
+      }
+    }
+
+    fetchUser();
+  }, []);
+  const handleInputChange = (e) => {
+    setPostText(e.target.value);
+  };
+
+  const handleSharePost = async () => {
+    try {
+      console.log(postText)
+      const response = await makeRequest.post('/post/createPost', {
+        userID: loggedInUser.userID,
+        postData: postText
+      });
+      if (response.status === 201) {
+        console.log(response.data.message);
+        // Reset the post text after successfully sharing
+        setPostText('');
+      }
+    } catch (error) {
+      console.error('Error sharing the post:', error);
+    }
+  };
+
   return (
     <div className="share">
       <div className="container">
         <div className="top">
-          <img
-            src={currentUser.profilePic}
-            alt=""
+          <input
+            type="text"
+            value={postText}
+            onChange={handleInputChange}
+            placeholder={`What's on your mind ${loggedInUser ? loggedInUser.username : 'Loading...'}?`}
           />
-          <input type="text" placeholder={`What's on your mind ${currentUser.name}?`} />
         </div>
         <hr />
         <div className="bottom">
           <div className="left">
-            <input type="file" id="file" style={{display:"none"}} />
+
             <label htmlFor="file">
               <div className="item">
                 <img src={Image} alt="" />
@@ -38,7 +77,7 @@ const Share = () => {
             </div>
           </div>
           <div className="right">
-            <button>Share</button>
+            <button onClick={handleSharePost}>Share</button>
           </div>
         </div>
       </div>

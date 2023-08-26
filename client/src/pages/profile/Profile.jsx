@@ -1,72 +1,113 @@
-import "./profile.scss";
-import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import PinterestIcon from "@mui/icons-material/Pinterest";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import PlaceIcon from "@mui/icons-material/Place";
-import LanguageIcon from "@mui/icons-material/Language";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Posts from "../../components/posts/Posts"
+import React, { useState, useEffect } from 'react';
+import { makeRequest } from "../../axios";
 
-const Profile = () => {
+
+function Profile() {
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await makeRequest.get('/userLogin/getLoggedInUser');
+        setLoggedInUser(response.data);
+        console.log(loggedInUser)
+      } catch (error) {
+        console.error('Error fetching the logged-in user:', error);
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+  const handleSearch = async () => {
+    try {
+      const response = await makeRequest.get(`/userLogin/searchUser?username=${searchQuery}`);
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error searching for users:', error);
+    }
+  };
+
   return (
-    <div className="profile">
-      <div className="images">
-        <img
-          src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          alt=""
-          className="cover"
-        />
-        <img
-          src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
-          alt=""
-          className="profilePic"
-        />
-      </div>
-      <div className="profileContainer">
-        <div className="uInfo">
-          <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <InstagramIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <TwitterIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <LinkedInIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <PinterestIcon fontSize="large" />
-            </a>
-          </div>
-          <div className="center">
-            <span>Jane Doe</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>USA</span>
-              </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>lama.dev</span>
-              </div>
-            </div>
-            <button>follow</button>
-          </div>
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
-          </div>
-        </div>
-      <Posts/>
-      </div>
+    <div>
+      <h1>Welcome, {loggedInUser ? loggedInUser.username : 'Loading...'}</h1>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <button onClick={handleSearch}>Search</button>
+      <ul>
+      {loggedInUser && searchResults.map((user) => (
+        <UserItem key={user.userID} user={user} loggedInUserID={loggedInUser.userID} />
+      ))}
+      </ul>
     </div>
   );
-};
+}
+
+
+function UserItem({ user, loggedInUserID }) {
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    async function checkFollowingStatus() {
+      try {
+        const response = await makeRequest.get(`/following/checkFollowing/${loggedInUserID}/${user.userID}`);
+        setIsFollowing(response.data.isFollowing);
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+      }
+    }
+
+    checkFollowingStatus();
+  }, [loggedInUserID, user]);
+
+  const handleFollow = async () => {
+    try {
+      const response = await makeRequest.post('/following/follow', {
+        userID: loggedInUserID,
+        targetUser: user.userID
+      });
+      
+      if (response.status === 201) {
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      console.error('Error following the user:', error);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      const response = await makeRequest.post('/following/unfollow', {
+        userID: loggedInUserID,
+        targetUser: user.userID
+      });
+      
+      if (response.status === 200) {
+        setIsFollowing(false);
+      }
+    } catch (error) {
+      console.error('Error unfollowing the user:', error);
+    }
+  };
+
+  return (
+    <li>
+      <div className="buttons">
+      {user.username}{' '}
+      {isFollowing ? (
+        
+        <button onClick={handleUnfollow} name="unfollowBtn">Unfollow</button>
+      ) : (
+        <button onClick={handleFollow} name="followBtn">Follow</button>
+      )}
+      </div>
+    </li>
+  );
+}
 
 export default Profile;

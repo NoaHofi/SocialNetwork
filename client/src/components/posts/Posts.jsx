@@ -11,7 +11,7 @@ const Posts = () => {
 )
   console.log(data)
   return (<div className="posts">
-    {error ? "Something is worng" : (isLoading ? "loading" : data.map((post)=>
+    {error ? "Something is worng" : (isLoading ? "loading" : data.postData.map((post)=>
       <Post post={post} key={post.postID}/>
     ))}
   </div>)
