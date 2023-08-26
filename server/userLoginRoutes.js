@@ -1,5 +1,7 @@
 const Router = require("express").Router();
 const users = require('./users');
+const jws = require('jws');
+
 
 // User Registration
 Router.post('/register', async (req, res) => {
@@ -44,8 +46,16 @@ Router.post('/login', async (req, res) => {
   }
   const user = await users.login(username,password);
   if (user) {
+    const token = jws.sign({
+      header: { alg: 'HS256', typ: 'JWT' },
+      payload: { id: user.userID },
+      secret: "secretkey"
+    });
+    
     console.log('User login successfully.')
-    res.status(201).json({ user });
+    res.cookie("accessToken",token,{ 
+      httpOnly: true,
+    }).status(201).json({ user });
   }
   else{
     console.log('The password is incorrect.')

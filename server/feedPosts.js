@@ -55,7 +55,7 @@ async function savePostData(userID,postData) {
     });
 
     console.log('Post data saved with ID:', postId);
-    admin.insertActivity(`User ${username} added a post: ${postData}`)
+    admin.insertActivity(`User ${userID} added a post: ${postData}`)
     return postId;
   } catch (error) {
     console.error('Error saving post data:', error);

@@ -1,5 +1,7 @@
 const Router = require("express").Router();
 const posts = require('./feedPosts');
+const jws = require('jws');
+
 // Create Post
 Router.post('/createPost',async (req, res) => {
   const { userID , postData } = req.body;
@@ -27,18 +29,24 @@ Router.post('/createPost',async (req, res) => {
 
 // Get Post
 Router.get('/getAllPosts', async (req, res) => {
-  const { userID} = req.query;
-  try {
-    if (postID == null) {
-      return res.status(400).json({ message: 'userID is required.' });
+  console.log(0)
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!")
+  console.log(token)
+
+   jws.verify(token, "HS256", "secretkey", (err,userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!")
+    console.log(userInfo.id)
+    try {
+      //const postData = await posts.getPostData(userInfo.id); // Use await since savePostData is an async function
+      //console.log(postData)
+      //res.status(201).json({postData });
+      es.status(201).json({"jfjffjffk":"ffff" });
+    } catch (error) {
+      console.error('Error during Get Post:', error);
+      res.status(500).json({ message: 'Internal server error.' });
     }
-   
-    const postData = await posts.getPostData(userID); // Use await since savePostData is an async function
-    res.status(201).json({ message: `${postData}` });
-  } catch (error) {
-    console.error('Error during Get Post:', error);
-    res.status(500).json({ message: 'Internal server error.' });
-  }
+  })
  
 });
 
