@@ -106,7 +106,7 @@ async function login(username, password) {
         .update('isLogin', true);
     });
     admin.insertActivity(`User ${username} successfully login`)
-    return true; // Login successful
+    return user; // Login successful
   } catch (err) {
     console.error('Error during login:', err.message);
     throw new Error('Login failed.');
@@ -152,13 +152,13 @@ async function removeUserFromDB(username) {
 async function isUserLoggedIn(username){
   try {
     console.log(`username: ${username}`);
-    const isLogin = await knex('users')
-      .select('islogin')
+    const user = await knex('users')
+      .where('islogin', true)
       .where('username', username)
       .first();
     
-    console.log(`isLoggedin: ${isLogin}`);
-    return isLogin;
+    console.log(`isLoggedin: ${!!user}`);
+    return !!user;  // This will convert the result to a boolean. If user exists, it will return true. Otherwise, false.
   } catch (error) {
     console.error('Error in isLogin:', error);
     throw error;

@@ -3,7 +3,8 @@ const users = require('./users');
 
 // User Registration
 Router.post('/register', async (req, res) => {
-    const { username, password } = req.query;
+    const { username, password } = req.body;
+
     try {
       // Check if the username is already taken
       if (username == null)
@@ -29,22 +30,25 @@ Router.post('/register', async (req, res) => {
   
 // User Login
 Router.post('/login', async (req, res) => {
-  const { username, password, rememberMe } = req.query;
+  const { username, password, rememberMe } = req.body;
   try {
+  console.log(`login ${username}`)
   const isExsit = await users.isUserExist(username);
   if (!isExsit) {
     return res.status(400).json({ message: 'Username not exist.' });
   }
   isLoggedIn = await users.isUserLoggedIn(username);
   if (isLoggedIn){
+    console.log('Username already logged in.')
     return res.status(400).json({ message: 'Username already logged in.' });
-
   }
-  const isLogin = await users.login(username,password);
-  if (isLogin) {
-    res.status(201).json({ message: 'User login successfully.' });
+  const user = await users.login(username,password);
+  if (user) {
+    console.log('User login successfully.')
+    res.status(201).json({ user });
   }
   else{
+    console.log('The password is incorrect.')
     return res.status(400).json({ message: 'The password is incorrect.' });
   }
   } catch (error) {

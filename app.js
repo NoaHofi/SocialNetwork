@@ -1,23 +1,25 @@
-const fs = require('fs');
-const path = require('path');
+const express = require('express');
+const app = express();
 
 // Import required modules
-const express = require('express');
 const cookieParser = require('cookie-parser');
 
 // Create an instance of Express
-const app = express();
 
 // Middleware for parsing cookies and request bodies
 app.use(cookieParser());
 app.use(express.json());
 
 
-// Import the cors package
 const cors = require('cors');
 
-// Enable CORS for all routes
-app.use(cors());
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 
 
 // Basic route for testing
