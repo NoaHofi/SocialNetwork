@@ -94,8 +94,7 @@ async function login(username, password) {
       throw new Error('User not found.');
     }
 
-    // Compare hashed password
-    const passwordMatch = password == user.password;
+    const passwordMatch = password === user.password;
     if (!passwordMatch) {
       throw new Error('Incorrect password.');
     }
