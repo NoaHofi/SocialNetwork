@@ -79,6 +79,7 @@ Router.post('/logout', async (req, res) => {
   }
   users.logout(username);
   res.status(201).json({ message: 'User logout successfully.' });
+  res.clearCookie("accessToken");
   } catch (error) {
     console.error('Error during Logout:', error);
     res.status(500).json({ message: 'Internal server error.' });

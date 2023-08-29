@@ -41,6 +41,7 @@ const Post = ({ post }) => {
       if (response.status === 200) {
         console.log(response.data.message);
         setIsEditing(false);
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error editing the post:', error);
