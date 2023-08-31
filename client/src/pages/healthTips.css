@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('../assets/35250_WEB_Blog_HerbsForRunners_0922_1920x.webp'); /* replace with the path to your image */
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    background-clip: content-box;
+    padding-top: 25vh; 
+    height: 100vh;
+    color: white;
+
+    
+}
+
+
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.tips-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.tips-list li {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    padding-left: 30px;
+    position: relative;
+}
+
+.tips-list li span {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
