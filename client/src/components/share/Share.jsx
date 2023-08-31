@@ -40,6 +40,7 @@ const Share = () => {
         console.log(response.data.message);
         // Reset the post text after successfully sharing
         setPostText('');
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error sharing the post:', error);
