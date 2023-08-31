@@ -2,6 +2,24 @@ const Router = require("express").Router();
 const users = require('./users');
 const jwt = require('jsonwebtoken');
 
+const verifyTokenAndAddUserInfo = (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  try {
+      const userInfo = jwt.verify(token, "secretkey");
+      req.userInfo = userInfo; // Add userInfo to the request object
+      next(); // Continue to the next middleware or route handler
+  } catch (error) {
+      if (error.name === 'JsonWebTokenError') {
+          console.error('Token verification failed:', error);
+          return res.status(403).json({ message: "Token is not valid!", error: error.message });
+      }
+      console.error('Error during token verification:', error);
+      res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+};
+
 // User Registration
 Router.post('/register', async (req, res) => {
     const { username, password } = req.body;
@@ -33,15 +51,10 @@ Router.post('/register', async (req, res) => {
 Router.post('/login', async (req, res) => {
   const { username, password, rememberMe } = req.body;
   try {
-  console.log(`login ${username}`)
+  console.log(`---------login ${username} rememberMe: ${rememberMe}------`)
   const isExsit = await users.isUserExist(username);
   if (!isExsit) {
     return res.status(400).json({ message: 'Username not exist.' });
-  }
-  isLoggedIn = await users.isUserLoggedIn(username);
-  if (isLoggedIn){
-    console.log('Username already logged in.')
-    return res.status(400).json({ message: 'Username already logged in.' });
   }
   const user = await users.login(username,password);
   if (user) {
@@ -56,7 +69,7 @@ Router.post('/login', async (req, res) => {
     res.cookie("accessToken",token,{ 
       httpOnly: true,
       maxAge: cookieMaxAge
-    }).status(201).json({ user });
+    }).status(200).json({ user });
   }
   else{
     console.log('The password is incorrect.')
@@ -88,18 +101,15 @@ Router.post('/logout', async (req, res) => {
 
 
 // Get loggedinUser
-Router.get('/getLoggedInUser', async (req, res) => {
+Router.get('/getLoggedInUser', verifyTokenAndAddUserInfo, async (req, res) => {
   console.log("in logged in user")
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!")
-  console.log(token)
+ 
   try {
-    const userInfo = jwt.verify(token, "secretkey");
 
-    console.log(userInfo.id);
-    const username = await users.getUsernameByUserID(userInfo.id);
+    console.log(req.userInfo.id);
+    const username = await users.getUsernameByUserID(req.userInfo.id);
     console.log(username)
-    res.status(201).json({ username: `${username}`, userID: userInfo.id });
+    res.status(201).json({ username: `${username}`, userID: req.userInfo.id });
 } catch (error) {
     if (error.name === 'JsonWebTokenError') {
         console.error('Token verification failed:', error);

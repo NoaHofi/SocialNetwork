@@ -17,8 +17,13 @@ export const AuthContextProvider = ({ children }) => {
       });
       console.log(res);
       
-    
-      setCurrentUser(res.data);
+      if (res.status === 200) { // Check if the status code is 200 OK
+        setCurrentUser(res.data);
+        return true;
+      } else {
+        console.log("Login failed"); // Display message for failed login
+        return false;
+      }
        
     } catch (error) {
       console.error('Error during login request:', error);

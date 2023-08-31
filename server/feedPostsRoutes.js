@@ -2,6 +2,26 @@ const Router = require("express").Router();
 const posts = require('./feedPosts');
 const jws = require('jws');
 const jwt = require('jsonwebtoken');
+
+// Middleware to verify token and add userInfo to request
+const verifyTokenAndAddUserInfo = (req, res, next) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  try {
+      const userInfo = jwt.verify(token, "secretkey");
+      req.userInfo = userInfo; // Add userInfo to the request object
+      next(); // Continue to the next middleware or route handler
+  } catch (error) {
+      if (error.name === 'JsonWebTokenError') {
+          console.error('Token verification failed:', error);
+          return res.status(403).json({ message: "Token is not valid!", error: error.message });
+      }
+      console.error('Error during token verification:', error);
+      res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+};
+
 // Create Post
 Router.post('/createPost',async (req, res) => {
   const { userID , postData } = req.body;
@@ -28,18 +48,18 @@ Router.post('/createPost',async (req, res) => {
 });
 
 // Get Post
-Router.get('/getAllPosts', async (req, res) => {
+Router.get('/getAllPosts',verifyTokenAndAddUserInfo, async (req, res) => {
   console.log(0)
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!")
-  console.log(token)
+  // const token = req.cookies.accessToken;
+  // if (!token) return res.status(401).json("Not logged in!")
+  // console.log(token)
   try {
-    const userInfo = jwt.verify(token, "secretkey");
+  //   const userInfo = jwt.verify(token, "secretkey");
 
-    console.log(userInfo.id);
-    const postData = await posts.getPostData(userInfo.id);
+    console.log(req.userInfo.id);
+    const postData = await posts.getPostData(req.userInfo.id);
     res.status(201).json({ postData });
-} catch (error) {
+  } catch (error) {
     if (error.name === 'JsonWebTokenError') {
         console.error('Token verification failed:', error);
         return res.status(403).json({ message: "Token is not valid!", error: error.message });

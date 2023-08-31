@@ -1,8 +1,7 @@
-import { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import "./login.scss";
-import React, { useState } from "react";
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -16,17 +15,33 @@ const [err, setErr] = useState(null);
 const navigate = useNavigate()
 
 const handleChange = (e) => {
-    setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  setInputs(prev => ({ ...prev, [e.target.name]: value }));
 };
 
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated } = useContext(AuthContext);
+
+  useEffect(() => {
+    // Check if the user is already authenticated
+    console.log(`useEffect: ${isAuthenticated}`)
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault()
     try
     {
-      await login(inputs);
-      navigate("/")
+      const isLogin = await login(inputs);
+      if (isLogin)
+      {
+        navigate("/")
+      }
+      else
+      {
+        setErr("Login failed.");
+      }
     }
     catch(err)
     {
@@ -54,12 +69,12 @@ const handleChange = (e) => {
           <form>
             <input type="text" placeholder="Username" name="username" onChange={handleChange}/>
             <input type="password" placeholder="Password" name="password" onChange={handleChange}/>
-            {err && err}
+            {err && <p className="error-message">{err}</p>}
             <label>
             <input 
               type="checkbox" 
               name="rememberMe" 
-              onChange={e => setInputs(prev => ({ ...prev, rememberMe: e.target.checked }))}
+              onChange={handleChange}
             />
             Remember me
           </label>
