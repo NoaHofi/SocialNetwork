@@ -7,6 +7,7 @@ function Admin() {
   const [pages, setPages] = useState([]);
   const [features, setFeatures] = useState([]);
   const [usernameToRemove, setUsernameToRemove] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -56,45 +57,58 @@ function Admin() {
 
   const handleRemoveUser = async () => {
     try {
-      await makeRequest.delete(`/admin/remove-user?username=${usernameToRemove}`);
+      const res = await makeRequest.delete(`/admin/remove-user?username=${usernameToRemove}`);
+      
+      if (res.status === 200) {
+        setFeedbackMessage("User removed successfully.");
+      } else {
+        // Optional: If there's a specific message from the server, you can display it.
+        setFeedbackMessage(res.data.message || "Error removing user.");
+      }
+      
       window.location.reload();
     } catch (error) {
       console.error("Error removing user:", error);
+      setFeedbackMessage("Error removing user. Please try again later.");
     }
-  }
+};
 
   return (
     <div className="admin-container">
       <div className="leftBar">
-        {/* Pages */}
-        {pages && pages.length > 0 ? (
-            <div className="item">
-                <span>Disable & Enable Pages</span>
-                {pages.map(page => (
-                    <div key={page.pageID}>
-                        <p>{page.pageName}</p>
-                        <button onClick={() => handleTogglePage(page.pageID, page.enabled)}>
-                            {page.enabled ? 'Disable' : 'Enable'}
-                        </button>
-                    </div>
-                ))}
-            </div>
-        ) : null}
+{/* Pages */}
+{pages && pages.length > 0 ? (
+    <div className="item">
+        <span>Disable & Enable Pages</span>
+        <ul>
+            {pages.map(page => (
+                <li key={page.pageID} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <p style={{ marginRight: '10px' }}>{page.pageName}</p>
+                    <button onClick={() => handleTogglePage(page.pageID, page.enabled)}>
+                        {page.enabled ? 'Disable' : 'Enable'}
+                    </button>
+                </li>
+            ))}
+        </ul>
+    </div>
+) : null}
 
-        {/* Features */}
-        {features && features.length > 0 ? (
-            <div className="item">
-                <span>Features</span>
-                {features.map(feature => (
-                    <div key={feature.featureID}>
-                        <p>{feature.featureName}</p>
-                        <button onClick={() => handleToggleFeature(feature.featureID, feature.enabled)}>
-                            {feature.enabled ? 'Disable' : 'Enable'}
-                        </button>
-                    </div>
-                ))}
-            </div>
-        ) : null}
+{/* Features */}
+{features && features.length > 0 ? (
+    <div className="item">
+        <span>Features</span>
+        <ul>
+            {features.map(feature => (
+                <li key={feature.featureID} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <p style={{ marginRight: '10px' }}>{feature.featureName}</p>
+                    <button onClick={() => handleToggleFeature(feature.featureID, feature.enabled)}>
+                        {feature.enabled ? 'Disable' : 'Enable'}
+                    </button>
+                </li>
+            ))}
+        </ul>
+    </div>
+) : null}
 
         {/* Remove User */}
         <div className="item">
@@ -106,6 +120,8 @@ function Admin() {
                 onChange={e => setUsernameToRemove(e.target.value)} 
             />
             <button onClick={handleRemoveUser}>Remove User</button>
+            {feedbackMessage && <div className="feedback">{feedbackMessage}</div>}
+
         </div>
 
       </div>

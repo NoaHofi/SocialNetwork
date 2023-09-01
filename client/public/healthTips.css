@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-image: url('../assets/35250_WEB_Blog_HerbsForRunners_0922_1920x.webp'); /* replace with the path to your image */
+    background-image: url('../src/assets/35250_WEB_Blog_HerbsForRunners_0922_1920x.webp'); /* replace with the path to your image */
     background-size: cover;
     background-position: center top;
     background-attachment: fixed;

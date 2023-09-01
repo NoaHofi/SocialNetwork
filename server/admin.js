@@ -66,6 +66,7 @@ async function updatePageStatus(pageID, isEnabled) {
 async function getAdditionalPages() {
   try {
     const pages = await knex('pages').select('pageID','pageName','enabled');
+    console.log("pages:"+pages)
     return pages;
   } catch (error) {
     throw new Error('Failed to get additional pages status from the database.');

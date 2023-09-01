@@ -16,9 +16,29 @@ import { AuthContext } from "../../context/authContext";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { makeRequest } from "../../axios";  
+
+
 const LeftBar = () => {
 
   const { currentUser } = useContext(AuthContext);
+  const [pages, setPages] = useState([]);
+
+  // Fetch the pages' status when the component mounts
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const response = await makeRequest.get('/admin/pages');
+        const data = response.data; // assuming the response structure has a data property
+        setPages(data.pages);
+      } catch (error) {
+        console.error("Failed to fetch pages:", error);
+      }
+    };
+
+    fetchPages();
+}, []);
 
   return (
     <div className="leftBar">
@@ -29,14 +49,18 @@ const LeftBar = () => {
             <PersonOutlinedIcon />
           </Link>
           </div>
-          <div className="item">
-            <img src={Friends} alt="" />
-            <span>Friends</span>
-          </div>
-          <div className="item">
-            <img src={Groups} alt="" />
-            <span>Groups</span>
-          </div>
+          {pages.find(page => page.pageName === "Scheduler" && page.enabled) && (
+            <div className="item">
+              <img src={Events} alt="" />
+              <a href="/schedualer.html">Games Calender</a>
+            </div>
+          )}
+          {pages.find(page => page.pageName === "HealthTips" && page.enabled) && (
+            <div className="item">
+              <img src={Groups} alt="" />
+              <a href="/healthTips.html">Health Tips</a>
+            </div>
+          )}
           <div className="item">
             <img src={Market} alt="" />
             <span>Marketplace</span>

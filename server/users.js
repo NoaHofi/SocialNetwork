@@ -143,6 +143,7 @@ async function removeUserFromDB(username) {
   try {
     // Delete the user
     await knex('users').where('username', username).del();
+    console.log("user"+ username + "has been remvoed")
   } catch (error) {
     console.error('Error removing user from the database:', error);
     throw new Error('Failed to remove user from the database.');

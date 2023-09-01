@@ -49,7 +49,7 @@ Router.put('/enable-disable/features', async (req, res) => {
 Router.get('/pages', async (req, res) => {
     try {
       const additionalPages = await admin.getAdditionalPages();
-  
+      console.log("routes"+additionalPages);
       res.status(200).json({ pages: additionalPages });
     } catch (error) {
       console.error('Error getting additional pages:', error);
@@ -70,7 +70,7 @@ Router.get('/features', async (req, res) => {
 });
 
 // Admin Screen: Remove User from the Social Network
-Router.delete('/admin/remove-user', async (req, res) => {
+Router.delete('/remove-user', async (req, res) => {
     const { username } = req.query;
   
     try {

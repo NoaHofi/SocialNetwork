@@ -43,13 +43,16 @@ function App() {
     );
   };
 
-  const ProtectedRoute = ({ children }) => {
-    if (!currentUser) {
+  const ProtectedRoute = ({ children, role }) => {
+    console.log("current"+currentUser.username)
+    console.log("role:"+role)
+    if (!currentUser || (role && currentUser.username !== role)) {
       return <Navigate to="/login" />;
     }
-
+  
     return children;
   };
+  
 
   const router = createBrowserRouter([
     {
@@ -80,8 +83,13 @@ function App() {
     },
     {
       path: "/admin",
-      element: <Admin />,
-    },
+      element: (
+        <ProtectedRoute role="admin">
+          <Admin />
+        </ProtectedRoute>
+      ),
+    }
+    
   ]);
 
   return (

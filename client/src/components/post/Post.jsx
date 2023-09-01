@@ -14,6 +14,8 @@ const Post = ({ post }) => {
   const [likeCount, setLikeCount] = useState(0);
 
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isPostEditEnabled, setIsPostEditEnabled] = useState(false);
+
 
 
 
@@ -43,6 +45,20 @@ const Post = ({ post }) => {
      };
      
      fetchFeatureStatus();
+
+     const fetchEditPostFeatureStatus = async () => {
+      try {
+        const response = await makeRequest.get('/admin/features');
+        const unlikeFeature = response.data.features.find(f => f.name === "edit post");  // Assuming each feature has a 'name' property
+        if (unlikeFeature) {
+          setIsPostEditEnabled(unlikeFeature.enabled);  // Assuming each feature has an 'enabled' property
+        }
+      } catch (error) {
+        console.error('Error fetching the feature status:', error);
+      }
+   };
+   
+   fetchEditPostFeatureStatus();
 
     }
 
@@ -131,7 +147,7 @@ const Post = ({ post }) => {
             </div>
           </div>
           {
-            loggedInUser ? (
+            loggedInUser && isPostEditEnabled ? (
               loggedInUser.userID === post.userID && (
                 isEditing ? (
                   <div className="editContainer">
