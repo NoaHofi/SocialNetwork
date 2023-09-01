@@ -10,6 +10,10 @@ const Post = ({ post }) => {
   const editInputRef = useRef(null);
   const [isUserFetched, setIsUserFetched] = useState(false);
 
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+
 
   useEffect(() => {
     async function fetchUser() {
@@ -24,8 +28,27 @@ const Post = ({ post }) => {
         setIsUserFetched(true);
       }
     }
+
+
+    const fetchLikeStatus = async () => {
+      // Placeholder
+      const response = await makeRequest.get(`/post/isLiked/${post.postID}`);
+      setIsLiked(response.data.isLiked);
+    };
+
+    // Fetch like count
+    const fetchLikeCount = async () => {
+      // Placeholder
+      const response = await makeRequest.get(`/post/likeCount/${post.postID}`);
+      setLikeCount(response.data.count);
+    };  
+
     fetchUser();
-  }, []);
+    fetchLikeStatus();
+    fetchLikeCount();
+
+
+  }, [post.postID]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -47,6 +70,39 @@ const Post = ({ post }) => {
       console.error('Error editing the post:', error);
     }
   };
+
+  const handleLike = async () => {
+    try {
+      const response = await makeRequest.put('/post/likePost', {
+        userID: loggedInUser.userID,
+        postID: post.postID
+      });
+  
+      if (response.status === 200) {
+        setIsLiked(true);
+        setLikeCount(prevCount => prevCount + 1);
+      }
+    } catch (error) {
+      console.error('Error liking the post:', error);
+    }
+  };
+  
+  const handleUnlike = async () => {
+    try {
+      const response = await makeRequest.put('/post/unlikePost', {
+        userID: loggedInUser.userID,
+        postID: post.postID
+      });
+  
+      if (response.status === 200) {
+        setIsLiked(false);
+        setLikeCount(prevCount => prevCount - 1);
+      }
+    } catch (error) {
+      console.error('Error unliking the post:', error);
+    }
+  };
+  
 
   return (
     <div className="post">
@@ -83,8 +139,10 @@ const Post = ({ post }) => {
         </div>
         <div className="info">
           <div className="item">
-            {/* Your like icons and other features can be placed here */}
-            12 Likes
+          {isLiked 
+                ? <button onClick={handleUnlike}>Unlike</button> 
+                : <button onClick={handleLike}>Like</button>}
+              {likeCount} Likes
           </div>
         </div>
       </div>

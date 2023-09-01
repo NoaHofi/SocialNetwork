@@ -88,7 +88,7 @@ Router.put('/editPost/:postId', async (req, res) => {
 });
 
 Router.put('/likePost', async (req, res) => {
-  const { userID,postID } = req.params; // Extract postId from URL parameter
+  const { userID,postID } =  req.body; // Extract postId from URL parameter
 
   try {
     if (!userID || !postID) {
@@ -103,5 +103,49 @@ Router.put('/likePost', async (req, res) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
+
+Router.put('/unlikePost', async (req, res) => {
+  const { userID, postID } = req.body;
+
+  try {
+    if (!userID || !postID) {
+      return res.status(400).json({ message: 'userID and postID are required.' });
+    }
+
+    await posts.unLikePost(userID, postID); 
+
+    res.status(200).json({ message: `${userID} unliked post with postID: ${postID}` });
+  } catch (error) {
+    console.error('Error unliking post:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+Router.get('/post/isLiked/:postID', async (req, res) => {
+  const userID = req.user.id;  // Assuming you have some authentication middleware setting the user in req.
+  const { postID } = req.params;
+
+  try {
+    const isLiked = await posts.isUserLikedPost(userID, postID);
+    res.status(200).json({ isLiked: isLiked });
+  } catch (error) {
+    console.error('Error checking like status:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+Router.get('/post/likeCount/:postID', async (req, res) => {
+  const { postID } = req.params;
+
+  try {
+    const likeCount = await posts.getPostLikeCount(postID);
+    res.status(200).json({ likeCount: likeCount });
+  } catch (error) {
+    console.error('Error fetching like count:', error);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
+
 
 module.exports = Router;

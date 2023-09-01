@@ -115,11 +115,44 @@ async function unLikePost(userID,postID) {
   }
 }
 
+async function isUserLikedPost(userID, postID) {
+  try {
+    const result = await knex('likes')
+      .where({
+        userID: userID,
+        postID: postID,
+      })
+      .first();
+
+    return !!result;  // Returns true if there's a result, otherwise false
+  } catch (error) {
+    console.error('Error checking if user liked post:', error);
+    throw error;
+  }
+}
+
+async function getPostLikeCount(postID) {
+  try {
+    const count = await knex('likes')
+      .where({
+        postID: postID,
+      })
+      .count('postID as likeCount');  // Count rows matching the postID
+
+    return count[0].likeCount;  // Return the count
+  } catch (error) {
+    console.error('Error fetching like count:', error);
+    throw error;
+  }
+}
+
 
 module.exports = {
   getPostData,
   savePostData,
   editPostData,
   likePost,
-  unLikePost
+  unLikePost,
+  isUserLikedPost,
+  getPostLikeCount
 };
