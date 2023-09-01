@@ -4,12 +4,23 @@ import "./admin.css";
 
 function Admin() {
   const [activities, setActivities] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const [pages, setPages] = useState([]);
   const [features, setFeatures] = useState([]);
   const [usernameToRemove, setUsernameToRemove] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
   useEffect(() => {
+
+    async function fetchUser() {
+        try {
+          const response = await makeRequest.get('/userLogin/getLoggedInUser');
+          setLoggedInUser(response.data);
+        } catch (error) {
+          console.error('Error fetching the logged-in user:', error);
+        } 
+    }
+
     async function fetchData() {
       try {
         const activityResponse = await makeRequest.get('/admin/activity-log');
@@ -27,7 +38,7 @@ function Admin() {
         console.error("Error fetching admin data:", error);
       }
     }
-
+    fetchUser();
     fetchData();
   }, []);
 
@@ -72,6 +83,15 @@ function Admin() {
       setFeedbackMessage("Error removing user. Please try again later.");
     }
 };
+
+    if (loggedInUser === null) {
+    // You might want to return a loading message or spinner while the user data is being fetched
+    return <div>Loading...</div>;
+    }
+
+    if (!(loggedInUser.username === "admin")) {
+    return <div>You are not authorized to view this page.</div>;
+    }
 
   return (
     <div className="admin-container">

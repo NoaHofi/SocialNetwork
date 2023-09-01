@@ -25,11 +25,9 @@ const handleChange = (e) => {
   useEffect(() => {
     const validateToken = async () => {
         try {
-
               const response = await makeRequest.post('/userLogin/validateToken', null, {
                 withCredentials: true
             });
-        
 
               if (response.data.valid) {
                   navigate('/');

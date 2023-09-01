@@ -14,15 +14,15 @@ import RightBar from "./components/rightBar/RightBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import "./style.scss";
-import { useContext } from "react";
+import { useContext, useEffect,useState} from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
 import { QueryClient , QueryClientProvider } from "react-query"; 
+import { makeRequest } from "./axios"; 
 
 function App() {
-  const {currentUser} = useContext(AuthContext);
-
   const { darkMode } = useContext(DarkModeContext);
+
 
   const queryClient = new QueryClient()
 
@@ -44,12 +44,9 @@ function App() {
   };
 
   const ProtectedRoute = ({ children, role }) => {
-    console.log("current"+currentUser.username)
-    console.log("role:"+role)
-    if (!currentUser || (role && currentUser.username !== role)) {
-      return <Navigate to="/login" />;
-    }
   
+    
+    
     return children;
   };
   
@@ -84,9 +81,7 @@ function App() {
     {
       path: "/admin",
       element: (
-        <ProtectedRoute role="admin">
           <Admin />
-        </ProtectedRoute>
       ),
     }
     

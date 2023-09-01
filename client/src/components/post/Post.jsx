@@ -8,16 +8,12 @@ const Post = ({ post }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedPostText, setEditedPostText] = useState(post.postData);
   const editInputRef = useRef(null);
-  const [isUserFetched, setIsUserFetched] = useState(false);
 
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [isPostEditEnabled, setIsPostEditEnabled] = useState(false);
-
-
-
 
   useEffect(() => {
     async function fetchUser() {
@@ -26,11 +22,8 @@ const Post = ({ post }) => {
         setLoggedInUser(response.data);
       } catch (error) {
         console.error('Error fetching the logged-in user:', error);
-      } finally {
-        // This will be called after trying to fetch the user,
-        // regardless of success or failure
-        setIsUserFetched(true);
-      }
+      } 
+    }
 
       const fetchFeatureStatus = async () => {
         try {
@@ -58,24 +51,21 @@ const Post = ({ post }) => {
       }
    };
    
-   fetchEditPostFeatureStatus();
-
-    }
-
-
-    const fetchLikeStatus = async () => {
-      // Placeholder
-      const response = await makeRequest.get(`/post/isLiked/${post.postID}`);
-      setIsLiked(response.data.isLiked);
+   
+   const fetchLikeStatus = async () => {
+     // Placeholder
+     const response = await makeRequest.get(`/post/isLiked/${post.postID}`);
+     setIsLiked(response.data.isLiked);
     };
-
+    
     // Fetch like count
     const fetchLikeCount = async () => {
       // Placeholder
       const response = await makeRequest.get(`/post/likeCount/${post.postID}`);
       setLikeCount(response.data.likeCount);
     };  
-
+    
+    fetchEditPostFeatureStatus();
     fetchUser();
     fetchLikeStatus();
     fetchLikeCount();
