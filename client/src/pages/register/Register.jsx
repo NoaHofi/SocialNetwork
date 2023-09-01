@@ -47,11 +47,14 @@ const Register = () => {
         <div className="register">
             <div className="card">
                 <div className="left">
-                    <h1>Lama Social.</h1>
+                    <h1>SportyNet.</h1>
                     <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
-                        alias totam numquam ipsa exercitationem dignissimos, error nam,
-                        consequatur.
+                        Welcome to SporyNet! 
+                        Connect with athletes, sports fans, 
+                        and fitness enthusiasts worldwide. 
+                        Share achievements, discuss games, and inspire others. 
+                        Join us and celebrate the power of sports. 
+                        Let's make every moment count!
                     </p>
                     <span>Do you have an account?</span>
                     <Link to="/login">

@@ -132,7 +132,7 @@ function Admin() {
 
         {/* Remove User */}
         <div className="item">
-            <span>Remove User</span>
+            <span>Remove User  </span>
             <input 
                 type="text" 
                 placeholder="Enter username to remove" 

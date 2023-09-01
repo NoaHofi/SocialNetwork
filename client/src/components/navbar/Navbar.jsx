@@ -56,7 +56,7 @@ const Navbar = () => {
     <div className="navbar">
       <div className="left">
         <Link to="/" style={{ textDecoration: "none" }}>
-          <span>lamasocial</span>
+          <span>SportyNet</span>
         </Link>
         <Link to="/" style={{ textDecoration: "none" }}>
           <HomeOutlinedIcon />
@@ -69,11 +69,12 @@ const Navbar = () => {
 
       </div>
       <div className="right">
+      <Link to="/" style={{ textDecoration: "none" }}>
+          <HomeOutlinedIcon />
+      </Link>
       <Link to="/profile" style={{ textDecoration: "none" }}>
         <PersonOutlinedIcon />
       </Link>
-        <EmailOutlinedIcon />
-        <NotificationsOutlinedIcon />
         <div className="user">
           {loggedInUser ? (
            <>
