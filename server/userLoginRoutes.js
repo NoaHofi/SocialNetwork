@@ -1,48 +1,18 @@
 const Router = require("express").Router();
-const users = require('./users');
+const persist = require('./persist');
 const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
 const secret = require('./secret');
-
-const jwtMiddleware = expressJwt.expressjwt({
-  secret: secret,
-  algorithms: ['HS256'],
-  getToken: function fromHeaderOrCookie(req) {
-    if (req.cookies && req.cookies.accessToken) {
-      return req.cookies.accessToken;
-    }
-    return null; // return null if no token found
-  }
-});
+const middleware = require('./Middleware');
 
 
 Router.post('/validateToken', (req, res, next) => {
   console.log(req.headers);
   console.log(req.cookies); // If you're using cookie-parser middleware
   next();
-}, jwtMiddleware, (req, res) => {
+}, middleware.jwtMiddleware, (req, res) => {
   res.status(200).json({ valid: true });
 });
-
-const verifyTokenAndAddUserInfo = (req, res, next) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
-
-  try {
-      const userInfo = jwt.verify(token, secret);
-      req.userInfo = userInfo; // Add userInfo to the request object
-      next(); // Continue to the next middleware or route handler
-  } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-          console.error('Token verification failed:', error);
-          return res.status(403).json({ message: "Token is not valid!", error: error.message });
-      }
-      console.error('Error during token verification:', error);
-      res.status(500).json({ message: 'Internal server error.', error: error.message });
-  }
-};
-
-
 
 
 // User Registration
@@ -59,12 +29,12 @@ Router.post('/register', async (req, res) => {
       {
         return res.status(400).json({ message: 'Password is null.' });
       }
-      const existingUser = await users.isUserExist(username);
+      const existingUser = await persist.isUserExist(username);
       if (existingUser) {
         return res.status(400).json({ message: 'Username already taken.' });
       }
   
-      const userId = await users.insertUser(username, password);
+      const userId = await persist.insertUser(username, password);
       res.status(201).json({ message: 'User registered successfully.' });
     } catch (error) {
       console.error('Error during registration:', error);
@@ -77,11 +47,11 @@ Router.post('/login', async (req, res) => {
   const { username, password, rememberMe } = req.body;
   try {
   console.log(`---------login ${username} rememberMe: ${rememberMe}------`)
-  const isExsit = await users.isUserExist(username);
+  const isExsit = await persist.isUserExist(username);
   if (!isExsit) {
     return res.status(400).json({ message: 'Username not exist.' });
   }
-  const user = await users.login(username,password);
+  const user = await persist.login(username,password);
   if (user) {
     const expirationDuration = rememberMe ? "10d" : "1h";
     const cookieMaxAge = rememberMe ? 10 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000; // in milliseconds
@@ -111,11 +81,11 @@ Router.post('/login', async (req, res) => {
 Router.post('/logout', async (req, res) => {
   const { username } = req.body;
   try {
-  const isExsit = await users.isUserExist(username);
+  const isExsit = await persist.isUserExist(username);
   if (!isExsit) {
     return res.status(400).json({ message: 'username not exist.' });
   }
-  users.logout(username);
+  persist.logout(username);
   res.clearCookie("accessToken");
   res.status(201).json({ message: 'User logout successfully.' });
   } catch (error) {
@@ -127,13 +97,11 @@ Router.post('/logout', async (req, res) => {
 
 
 // Get loggedinUser
-Router.get('/getLoggedInUser', verifyTokenAndAddUserInfo, async (req, res) => {
+Router.get('/getLoggedInUser', middleware.verifyTokenAndAddUserInfo, async (req, res) => {
   console.log("in logged in user")
- 
   try {
-
     console.log(req.userInfo.id);
-    const username = await users.getUsernameByUserID(req.userInfo.id);
+    const username = await persist.getUsernameByUserID(req.userInfo.id);
     console.log(username)
     res.status(201).json({ username: `${username}`, userID: req.userInfo.id });
 } catch (error) {
@@ -154,7 +122,7 @@ Router.get('/searchUser', async (req, res) => {
   }
 
   try {
-      const usersResult = await users.searchUserByPrefix(username_prefix);
+      const usersResult = await persist.searchUserByPrefix(username_prefix);
       res.json(usersResult);
   } catch (error) {
       console.error('Error during search:', error);

@@ -28,7 +28,7 @@ const Post = ({ post }) => {
       const fetchFeatureStatus = async () => {
         try {
           const response = await makeRequest.get('/admin/features');
-          const unlikeFeature = response.data.features.find(f => f.name === "unlike post");  // Assuming each feature has a 'name' property
+          const unlikeFeature = response.data.features.find(f => f.featureName === "unlike post");  // Assuming each feature has a 'name' property
           if (unlikeFeature) {
             setIsEnabled(unlikeFeature.enabled);  // Assuming each feature has an 'enabled' property
           }
@@ -42,9 +42,9 @@ const Post = ({ post }) => {
      const fetchEditPostFeatureStatus = async () => {
       try {
         const response = await makeRequest.get('/admin/features');
-        const unlikeFeature = response.data.features.find(f => f.name === "edit post");  // Assuming each feature has a 'name' property
-        if (unlikeFeature) {
-          setIsPostEditEnabled(unlikeFeature.enabled);  // Assuming each feature has an 'enabled' property
+        const editFeature = response.data.features.find(f => f.featureName === "edit post");  // Assuming each feature has a 'name' property
+        if (editFeature) {
+          setIsPostEditEnabled(editFeature.enabled);  // Assuming each feature has an 'enabled' property
         }
       } catch (error) {
         console.error('Error fetching the feature status:', error);

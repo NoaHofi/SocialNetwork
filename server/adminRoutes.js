@@ -1,12 +1,11 @@
 const Router = require("express").Router();
-const admin = require('./admin');
-const users = require('./users');
+const persist = require('./persist');
 
 
 // Admin Screen: Get Activity Log
 Router.get('/activity-log',async (req, res) => {
     try {
-        const allActivities = await admin.getAllActivityLog();
+        const allActivities = await persist.getAllActivityLog();
     
         res.status(200).json({ activities: allActivities });
       } catch (error) {
@@ -22,7 +21,7 @@ Router.put('/enable-disable/pages', async (req, res) => {
     const { pageID, enabled } = req.body;
 
   try {
-    await admin.updatePageStatus(pageID, enabled);
+    await persist.updatePageStatus(pageID, enabled);
     res.status(200).json({ message: 'Page status updated successfully.' });
     console.log("update succeed");
   } catch (error) {
@@ -36,7 +35,7 @@ Router.put('/enable-disable/features', async (req, res) => {
     const { featureID, enabled } = req.body;
 
     try {
-      await admin.updateFeatureStatus(featureID, enabled);
+      await persist.updateFeatureStatus(featureID, enabled);
       res.status(200).json({ message: 'Feature status updated successfully.' });
     } catch (error) {
       console.error(error);
@@ -48,7 +47,7 @@ Router.put('/enable-disable/features', async (req, res) => {
 // Get pages
 Router.get('/pages', async (req, res) => {
     try {
-      const additionalPages = await admin.getAdditionalPages();
+      const additionalPages = await persist.getAdditionalPages();
       console.log("routes"+additionalPages);
       res.status(200).json({ pages: additionalPages });
     } catch (error) {
@@ -60,7 +59,7 @@ Router.get('/pages', async (req, res) => {
 // Get features
 Router.get('/features', async (req, res) => {
     try {
-      const additionalFeatures = await admin.getAdditionalFeatures();
+      const additionalFeatures = await persist.getAdditionalFeatures();
   
       res.status(200).json({ features: additionalFeatures });
     } catch (error) {
@@ -75,13 +74,13 @@ Router.delete('/remove-user', async (req, res) => {
   
     try {
       // Check if the user exists before attempting to delete
-      const isexist = await users.isUserExist(username);
+      const isexist = await persist.isUserExist(username);
       console.log(`in adminRoutes is exist: ${isexist}`);
       if (!isexist) {
         res.status(404).json({ message: 'User not found.' });
       }
       else{
-        await users.removeUserFromDB(username);
+        await persist.removeUserFromDB(username);
   
         res.status(200).json({ message: `User ${username} has been removed.` });
       }

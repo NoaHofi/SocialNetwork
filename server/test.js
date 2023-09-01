@@ -44,9 +44,8 @@ const runTests = async () => {
   
   // Validate Token
   // Note: This might need an actual token either in the headers or as a cookie
-  await testEndpoint('POST', '/userLogin/validateToken', null, {
-    'Cookie': `accessToken=${jwtToken}`
-});
+  await testEndpoint('POST', '/userLogin/validateToken', null, { withCredentials: true });
+
 
   // Search User (assuming you're looking for users that start with "test")
   await testEndpoint('GET', '/userLogin/searchUser?username=testUser');
@@ -84,7 +83,7 @@ const runTests = async () => {
     await testEndpoint('POST', '/post/createPost', { postData: 'This is a test post.' });
     await testEndpoint('POST', '/post/createPost', { userID: 'testUser' });
     // Test fetching all posts
-    await testEndpoint('GET', '/post/getAllPosts');
+    await testEndpoint('GET', '/post/Posts');
     // Test editing a post
     await testEndpoint('PUT', '/post/editPost/1', { newPostData: 'This is the edited post content.' });
     // Test liking a post

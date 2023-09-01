@@ -1,27 +1,6 @@
 const Router = require("express").Router();
-const posts = require('./feedPosts');
-const jws = require('jws');
-const jwt = require('jsonwebtoken');
-const secret = require("./secret");
-
-// Middleware to verify token and add userInfo to request
-const verifyTokenAndAddUserInfo = (req, res, next) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
-
-  try {
-      const userInfo = jwt.verify(token, secret);
-      req.userInfo = userInfo; // Add userInfo to the request object
-      next(); // Continue to the next middleware or route handler
-  } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-          console.error('Token verification failed:', error);
-          return res.status(403).json({ message: "Token is not valid!", error: error.message });
-      }
-      console.error('Error during token verification:', error);
-      res.status(500).json({ message: 'Internal server error.', error: error.message });
-  }
-};
+const persist = require('./persist');
+const middleware = require('./Middleware');
 
 // Create Post
 Router.post('/createPost',async (req, res) => {
@@ -38,7 +17,7 @@ Router.post('/createPost',async (req, res) => {
       return res.status(400).json({ message: 'Textual post is limited to 300 characters.' });
     }
 
-    const postID = await posts.savePostData(userID, postData);
+    const postID = await persist.savePostData(userID, postData);
     console.log(`Post created with ID: ${postID}`);
 
     res.status(201).json({ message: `Post created successfully. postID: ${postID}` });
@@ -49,13 +28,13 @@ Router.post('/createPost',async (req, res) => {
 });
 
 // Get Post
-Router.get('/getAllPosts',verifyTokenAndAddUserInfo, async (req, res) => {
+Router.get('/Posts',middleware.verifyTokenAndAddUserInfo, async (req, res) => {
   console.log(0)
   
   try {
 
     console.log(req.userInfo.id);
-    const postData = await posts.getPostData(req.userInfo.id);
+    const postData = await persist.getPostData(req.userInfo.id);
     res.status(201).json({ postData });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
@@ -78,7 +57,7 @@ Router.put('/editPost/:postId', async (req, res) => {
       return res.status(400).json({ message: 'New post data is required.' });
     }
 
-    const editedPostId = await posts.editPostData(postId, newPostData); // Call the editPostData function
+    const editedPostId = await persist.editPostData(postId, newPostData); // Call the editPostData function
 
     res.status(200).json({ message: `Post edited successfully. postID: ${editedPostId}` });
   } catch (error) {
@@ -95,7 +74,7 @@ Router.put('/likePost', async (req, res) => {
       return res.status(400).json({ message: 'userID and postID are required.' });
     }
 
-    await posts.likePost(userID,postID); // Call the editPostData function
+    await persist.likePost(userID,postID); // Call the editPostData function
 
     res.status(200).json({ message: `${userID} like post postID: ${postID}` });
   } catch (error) {
@@ -112,7 +91,7 @@ Router.put('/unlikePost', async (req, res) => {
       return res.status(400).json({ message: 'userID and postID are required.' });
     }
 
-    await posts.unLikePost(userID, postID); 
+    await persist.unLikePost(userID, postID); 
 
     res.status(200).json({ message: `${userID} unliked post with postID: ${postID}` });
   } catch (error) {
@@ -121,12 +100,12 @@ Router.put('/unlikePost', async (req, res) => {
   }
 });
 
-Router.get('/isLiked/:postID', verifyTokenAndAddUserInfo, async (req, res) => {
+Router.get('/isLiked/:postID', middleware.verifyTokenAndAddUserInfo, async (req, res) => {
   const userID = req.userInfo.id;  // Assuming you have some authentication middleware setting the user in req.
   const { postID } = req.params;
 
   try {
-    const isLiked = await posts.isUserLikedPost(userID, postID);
+    const isLiked = await persist.isUserLikedPost(userID, postID);
     res.status(200).json({ isLiked: isLiked });
   } catch (error) {
     console.error('Error checking like status:', error);
@@ -138,7 +117,7 @@ Router.get('/likeCount/:postID', async (req, res) => {
   const { postID } = req.params;
 
   try {
-    const likeCount = await posts.getPostLikeCount(postID);
+    const likeCount = await persist.getPostLikeCount(postID);
     res.status(200).json({ likeCount: likeCount });
   } catch (error) {
     console.error('Error fetching like count:', error);

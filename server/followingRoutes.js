@@ -1,7 +1,7 @@
 const Router = require("express").Router();
 
 
-const followers = require('./follower');
+const persist = require('./persist');
 
 // Get followers
 Router.get('/followers', async (req, res) => {
@@ -11,7 +11,7 @@ Router.get('/followers', async (req, res) => {
       return res.status(400).json({ message: 'UserID is required.' });
     }
 
-    const userFollowers = await followers.getFollowers(userID);
+    const userFollowers = await persist.getFollowers(userID);
 
     res.status(200).json({ followers: userFollowers });
   } catch (error) {
@@ -28,7 +28,7 @@ Router.post('/follow', async (req, res) => {
       return res.status(400).json({ message: 'Both userID and targetUser are required.' });
     }
 
-    const followerId = await followers.follow(userID, targetUser);
+    const followerId = await persist.follow(userID, targetUser);
 
     res.status(201).json({ message: `User ${userID} is now following ${targetUser}. Follower ID: ${followerId}` });
   } catch (error) {
@@ -45,7 +45,7 @@ Router.post('/unfollow', async (req, res) => {
       return res.status(400).json({ message: 'Both userID and targetUser are required.' });
     }
 
-    const numDeleted = await followers.unFollow(userID, targetUser);
+    const numDeleted = await persist.unFollow(userID, targetUser);
 
     if (numDeleted === null) {
       return res.status(404).json({ message: 'No follower data found to unfollow.' });
@@ -62,7 +62,7 @@ Router.post('/unfollow', async (req, res) => {
 
 Router.get('/allUsers', async (req, res) => {
   try {
-    const users = await getAllUsers();
+    const users = await persist.getAllUsers();
     res.status(200).json(users);
   } catch (error) {
     console.error('Error fetching all users:', error);
@@ -74,7 +74,7 @@ Router.get('/allUsers', async (req, res) => {
 Router.get('/checkFollowing/:loggedInUserID/:targetUserID', async (req, res) => {
   try {
     const { loggedInUserID, targetUserID } = req.params;
-    const isFollowing = await followers.checkFollowing(loggedInUserID, targetUserID);
+    const isFollowing = await persist.checkFollowing(loggedInUserID, targetUserID);
     res.status(200).json({ isFollowing });
   } catch (error) {
     console.error('Error checking follow status:', error);
