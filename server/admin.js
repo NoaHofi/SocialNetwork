@@ -11,13 +11,13 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
       table.boolean('enabled').notNullable();
     });
     console.log('Pages table created.');
-  }
 
-  await knex('pages').insert([
-    { pageName: 'HealthTips', enabled: true },
-    { pageName: 'Scheduler', enabled: true }
-  ]);
-  console.log('HealthTips and Scheduler pages added.');
+    await knex('pages').insert([
+      { pageName: 'HealthTips', enabled: true },
+      { pageName: 'Scheduler', enabled: true }
+    ]);
+    console.log('HealthTips and Scheduler pages added.');
+  }
 
   const fetatureTableExists = await knex.schema.hasTable('features');
 
@@ -29,9 +29,15 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
       table.boolean('enabled').notNullable();
     });
     console.log('features table created.');
+
+    await knex('features').insert([
+      { featureName: 'unlike post', enabled: true },
+      { featureName: 'edit post', enabled: true }
+    ]);
+    console.log('unlike post and edit post features added.');
   }
 
-  activityTableExists = await knex.schema.hasTable('activityLog');
+  const activityTableExists = await knex.schema.hasTable('activityLog');
 
   if (!activityTableExists) {
     // Create a new 'activityLog' table
@@ -42,8 +48,8 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
     });
     console.log('activityLog table created.');
   }
-
 })();
+
 
 
 async function updatePageStatus(pageID, isEnabled) {
@@ -59,7 +65,7 @@ async function updatePageStatus(pageID, isEnabled) {
 
 async function getAdditionalPages() {
   try {
-    const pages = await knex('pages').select('pagaID','pageName','enabled');
+    const pages = await knex('pages').select('pageID','pageName','enabled');
     return pages;
   } catch (error) {
     throw new Error('Failed to get additional pages status from the database.');

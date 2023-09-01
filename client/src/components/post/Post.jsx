@@ -13,6 +13,8 @@ const Post = ({ post }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
+  const [isEnabled, setIsEnabled] = useState(false);
+
 
 
   useEffect(() => {
@@ -27,6 +29,21 @@ const Post = ({ post }) => {
         // regardless of success or failure
         setIsUserFetched(true);
       }
+
+      const fetchFeatureStatus = async () => {
+        try {
+          const response = await makeRequest.get('/admin/features');
+          const unlikeFeature = response.data.features.find(f => f.name === "unlike post");  // Assuming each feature has a 'name' property
+          if (unlikeFeature) {
+            setIsEnabled(unlikeFeature.enabled);  // Assuming each feature has an 'enabled' property
+          }
+        } catch (error) {
+          console.error('Error fetching the feature status:', error);
+        }
+     };
+     
+     fetchFeatureStatus();
+
     }
 
 
@@ -140,7 +157,7 @@ const Post = ({ post }) => {
         <div className="info">
           <div className="item">
           {isLiked 
-                ? <button onClick={handleUnlike}>Unlike</button> 
+                ? (isEnabled && <button onClick={handleUnlike}>Unlike</button>) 
                 : <button onClick={handleLike}>Like</button>}
               {likeCount} Likes
           </div>

@@ -19,12 +19,12 @@ Router.get('/activity-log',async (req, res) => {
 
 // Admin Screen: Enable/Disable Additional Pages
 Router.put('/enable-disable/pages', async (req, res) => {
-    const { pageID, isEnabled } = req.body;
+    const { pageID, enabled } = req.body;
 
   try {
-    await admin.updatePageStatus(pageID, isEnabled);
+    await admin.updatePageStatus(pageID, enabled);
     res.status(200).json({ message: 'Page status updated successfully.' });
-    conosole.log("update succeed");
+    console.log("update succeed");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while updating the page status.' });
@@ -33,10 +33,10 @@ Router.put('/enable-disable/pages', async (req, res) => {
 
 // Admin Screen: Enable/Disable Additional Features
 Router.put('/enable-disable/features', async (req, res) => {
-    const { featureID, isEnabled } = req.body;
+    const { featureID, enabled } = req.body;
 
     try {
-      await admin.updateFeatureStatus(featureID, isEnabled);
+      await admin.updateFeatureStatus(featureID, enabled);
       res.status(200).json({ message: 'Feature status updated successfully.' });
     } catch (error) {
       console.error(error);
@@ -62,7 +62,7 @@ Router.get('/features', async (req, res) => {
     try {
       const additionalFeatures = await admin.getAdditionalFeatures();
   
-      res.status(200).json({ pages: additionalFeatures });
+      res.status(200).json({ features: additionalFeatures });
     } catch (error) {
       console.error('Error getting additional features:', error);
       res.status(500).json({ message: 'Internal server error.' });
