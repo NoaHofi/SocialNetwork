@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import "./login.scss";
+import { makeRequest } from "../../axios";
 
 const Login = () => {
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
-    rememberMe: false
+    rememberMe: "",
   });
 
 const [err, setErr] = useState(null);
@@ -22,12 +23,25 @@ const handleChange = (e) => {
   const { login, isAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
-    // Check if the user is already authenticated
-    console.log(`useEffect: ${isAuthenticated}`)
-    if (isAuthenticated) {
-      navigate("/");
+    const validateToken = async () => {
+        try {
+
+              const response = await makeRequest.post('/userLogin/validateToken', null, {
+                withCredentials: true
+            });
+        
+
+              if (response.data.valid) {
+                  navigate('/');
+              }
+            
+        } catch (error) {
+            console.error('Error validating token:', error);
+        }
     }
-  }, [isAuthenticated, navigate]);
+
+    validateToken();
+}, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault()

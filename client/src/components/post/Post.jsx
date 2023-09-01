@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "./post.scss";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { makeRequest } from "../../axios";  // Assuming you have this axios config
+import { makeRequest } from "../../axios";  
 
 const Post = ({ post }) => {
   const [loggedInUser, setLoggedInUser] = useState(null);

@@ -31,7 +31,8 @@ function Profile() {
   };
 
   return (
-    <div>
+    <div className="rightBar">
+    <div className="container">
       <h1>Welcome, {loggedInUser ? loggedInUser.username : 'Loading...'}</h1>
       <input
         type="text"
@@ -40,11 +41,14 @@ function Profile() {
       />
       <button onClick={handleSearch}>Search</button>
       <ul>
-      {loggedInUser && searchResults.map((user) => (
-        <UserItem key={user.userID} user={user} loggedInUserID={loggedInUser.userID} />
-      ))}
+        {loggedInUser && searchResults.map((user) => (
+          <li className="item">
+            <UserItem key={user.userID} user={user} loggedInUserID={loggedInUser.userID} />
+          </li>
+        ))}
       </ul>
     </div>
+  </div>
   );
 }
 
@@ -96,17 +100,18 @@ function UserItem({ user, loggedInUserID }) {
   };
 
   return (
-    <li>
-      <div className="buttons">
-      {user.username}{' '}
+    <div className="user">
+    <div className="userInfo">
+      <span>{user.username}</span>
+    </div>
+    <div className="buttons">
       {isFollowing ? (
-        
         <button onClick={handleUnfollow} name="unfollowBtn">Unfollow</button>
       ) : (
         <button onClick={handleFollow} name="followBtn">Follow</button>
       )}
-      </div>
-    </li>
+    </div>
+  </div>
   );
 }
 

@@ -2,6 +2,7 @@ const Router = require("express").Router();
 const posts = require('./feedPosts');
 const jws = require('jws');
 const jwt = require('jsonwebtoken');
+const secret = require("./secret");
 
 // Middleware to verify token and add userInfo to request
 const verifyTokenAndAddUserInfo = (req, res, next) => {
@@ -9,7 +10,7 @@ const verifyTokenAndAddUserInfo = (req, res, next) => {
   if (!token) return res.status(401).json("Not logged in!");
 
   try {
-      const userInfo = jwt.verify(token, "secretkey");
+      const userInfo = jwt.verify(token, secret);
       req.userInfo = userInfo; // Add userInfo to the request object
       next(); // Continue to the next middleware or route handler
   } catch (error) {
@@ -50,11 +51,8 @@ Router.post('/createPost',async (req, res) => {
 // Get Post
 Router.get('/getAllPosts',verifyTokenAndAddUserInfo, async (req, res) => {
   console.log(0)
-  // const token = req.cookies.accessToken;
-  // if (!token) return res.status(401).json("Not logged in!")
-  // console.log(token)
+  
   try {
-  //   const userInfo = jwt.verify(token, "secretkey");
 
     console.log(req.userInfo.id);
     const postData = await posts.getPostData(req.userInfo.id);

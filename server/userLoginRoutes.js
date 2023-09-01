@@ -1,13 +1,35 @@
 const Router = require("express").Router();
 const users = require('./users');
 const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
+const secret = require('./secret');
+
+const jwtMiddleware = expressJwt.expressjwt({
+  secret: secret,
+  algorithms: ['HS256'],
+  getToken: function fromHeaderOrCookie(req) {
+    if (req.cookies && req.cookies.accessToken) {
+      return req.cookies.accessToken;
+    }
+    return null; // return null if no token found
+  }
+});
+
+
+Router.post('/validateToken', (req, res, next) => {
+  console.log(req.headers);
+  console.log(req.cookies); // If you're using cookie-parser middleware
+  next();
+}, jwtMiddleware, (req, res) => {
+  res.status(200).json({ valid: true });
+});
 
 const verifyTokenAndAddUserInfo = (req, res, next) => {
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("Not logged in!");
 
   try {
-      const userInfo = jwt.verify(token, "secretkey");
+      const userInfo = jwt.verify(token, secret);
       req.userInfo = userInfo; // Add userInfo to the request object
       next(); // Continue to the next middleware or route handler
   } catch (error) {
@@ -19,6 +41,9 @@ const verifyTokenAndAddUserInfo = (req, res, next) => {
       res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 };
+
+
+
 
 // User Registration
 Router.post('/register', async (req, res) => {
@@ -60,7 +85,7 @@ Router.post('/login', async (req, res) => {
   if (user) {
     const expirationDuration = rememberMe ? "10d" : "1h";
     const cookieMaxAge = rememberMe ? 10 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000; // in milliseconds
-    const token = jwt.sign({ id: user.userID }, "secretkey", {
+    const token = jwt.sign({ id: user.userID }, secret, {
       algorithm: 'HS256',
       expiresIn: expirationDuration // Optional: specify a duration for token expiration
   });
@@ -84,15 +109,15 @@ Router.post('/login', async (req, res) => {
 
 // User Logout
 Router.post('/logout', async (req, res) => {
-  const { username } = req.query;
+  const { username } = req.body;
   try {
   const isExsit = await users.isUserExist(username);
   if (!isExsit) {
     return res.status(400).json({ message: 'username not exist.' });
   }
   users.logout(username);
-  res.status(201).json({ message: 'User logout successfully.' });
   res.clearCookie("accessToken");
+  res.status(201).json({ message: 'User logout successfully.' });
   } catch (error) {
     console.error('Error during Logout:', error);
     res.status(500).json({ message: 'Internal server error.' });

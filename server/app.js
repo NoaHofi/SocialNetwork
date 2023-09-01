@@ -3,6 +3,7 @@ const app = express();
 
 // Import required modules
 const cookieParser = require('cookie-parser');
+const secret = require('./secret');
 
 // Create an instance of Express
 

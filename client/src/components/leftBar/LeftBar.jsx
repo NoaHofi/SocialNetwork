@@ -13,6 +13,7 @@ import Tutorials from "../../assets/11.png";
 import Courses from "../../assets/12.png";
 import Fund from "../../assets/13.png";
 import { AuthContext } from "../../context/authContext";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 const LeftBar = () => {
@@ -24,8 +25,9 @@ const LeftBar = () => {
       <div className="container">
         <div className="menu">
           <div className="user">
-          <Link to="/profile">Go to Profile</Link>
-            <span>{currentUser.name}</span>
+          <Link to="/profile">
+            <PersonOutlinedIcon />
+          </Link>
           </div>
           <div className="item">
             <img src={Friends} alt="" />
