@@ -121,8 +121,8 @@ Router.put('/unlikePost', async (req, res) => {
   }
 });
 
-Router.get('/post/isLiked/:postID', async (req, res) => {
-  const userID = req.user.id;  // Assuming you have some authentication middleware setting the user in req.
+Router.get('/isLiked/:postID', verifyTokenAndAddUserInfo, async (req, res) => {
+  const userID = req.userInfo.id;  // Assuming you have some authentication middleware setting the user in req.
   const { postID } = req.params;
 
   try {
@@ -134,7 +134,7 @@ Router.get('/post/isLiked/:postID', async (req, res) => {
   }
 });
 
-Router.get('/post/likeCount/:postID', async (req, res) => {
+Router.get('/likeCount/:postID', async (req, res) => {
   const { postID } = req.params;
 
   try {

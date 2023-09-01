@@ -40,7 +40,7 @@ const Post = ({ post }) => {
     const fetchLikeCount = async () => {
       // Placeholder
       const response = await makeRequest.get(`/post/likeCount/${post.postID}`);
-      setLikeCount(response.data.count);
+      setLikeCount(response.data.likeCount);
     };  
 
     fetchUser();

@@ -1,5 +1,6 @@
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import Admin from "./pages/admin/admin";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -76,6 +77,10 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    {
+      path: "/admin",
+      element: <Admin />,
     },
   ]);
 

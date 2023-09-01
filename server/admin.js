@@ -13,6 +13,12 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
     console.log('Pages table created.');
   }
 
+  await knex('pages').insert([
+    { pageName: 'HealthTips', enabled: true },
+    { pageName: 'Scheduler', enabled: true }
+  ]);
+  console.log('HealthTips and Scheduler pages added.');
+
   const fetatureTableExists = await knex.schema.hasTable('features');
 
   if (!fetatureTableExists) {
