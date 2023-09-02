@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Social Network Readme</title>
+</head>
+<body>
+  <h1>Social Network Project Readme</h1>
+  <h2>Social Network Name:</h2>
+  <p>SportyNet</p>
+  <h1>Instructions for starting the server:</h1>
+  <p>
+    Inside the server folder run : "node app.js"<br>
+    Inside the client folder run : "npm start"<br>
+    Browse to http://localhost:3000/login and you can login or register a new user.
+  </p>
+  
+
+  <h2>Additional Pages Added</h2>
+  <ul>
+    <li>Game Calender: weekly calender for sport games</li>
+    <li>health tips: tips for health care</li>
+  </ul>
+
+  <h2>Additional Features Added</h2>
+  <ul>
+    <li>Edit Post: ability to edit posts after created for the user</li>
+    <li>Unlike post: ability to unlike post if the user liked it</li>
+  </ul>
+
+  <h2>Challenges Faced</h2>
+  <p>ofek:follow/unfollow user while searching them</p>
+  <p>noa:remember me</p>
+
+  <h2>Partner Details</h2>
+  <p>
+    Name: Ofek Yanir<br>
+    ID: 206295040<br>
+    Partner's Name: Noa Hofi<br>
+    Partner's ID: 207166968
+  </p>
+
+  <p>
+    I did the follower page and static pages. Noa did the remember me part and login logout. we did all the rest together.
+  </p>
+
+  <h2>Server Routes Supported</h2>
+  <ul>
+    <li>/admin/remove-user?username=:username (DELETE): Remove a user</li>
+    <li>/userLogin/register (POST): User registration</li>
+    <li>/userLogin/login (POST): User login</li>
+    <li>/userLogin/searchUser?username=:username (GET): Search for users by username</li>
+    <li>/userLogin/logout (POST): User logout</li>
+    <li>/following/followers?userID=:userID (GET): Get followers of a user</li>
+    <li>/following/follow (POST): Follow a user</li>
+    <li>/following/unfollow (POST): Unfollow a user</li>
+    <li>/following/allUsers (GET): Fetch all users</li>
+    <li>/following/checkFollowing/:userID/:targetUser (GET): Check if one user follows another</li>
+    <li>/post/createPost (POST): Create a new post</li>
+    <li>/post/editPost/:postId (PUT): Edit an existing post</li>
+    <li>/post/likePost (PUT): Like a post</li>
+    <li>/post/unlikePost (PUT): Unlike a post</li>
+    <li>/post/likeCount/:postId (GET): Get like count for a post</li>
+    <li>/admin/activity-log (GET): Get activity log (Admin only)</li>
+    <li>/admin/enable-disable/pages (PUT): Enable/disable additional pages (Admin only)</li>
+    <li>/admin/enable-disable/features (PUT): Enable/disable additional features (Admin only)</li>
+    <li>/admin/pages (GET): Get pages info (Admin only)</li>
+    <li>/admin/features (GET): Get features info (Admin only)</li>
+    <li>/about (GET): About Us page</li>
+    <li>/contact (GET): Contact Us page</li>
+  </ul>  
+</body>
+</html>

@@ -16,6 +16,7 @@ import "./style.scss";
 import { useContext, useEffect} from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { QueryClient , QueryClientProvider } from "react-query"; 
+import Readme from "./components/Readme";
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
@@ -81,6 +82,10 @@ function App() {
       element: (
           <Admin />
       ),
+    },
+    {
+      path: "/readme",
+      element: <Readme />,
     }
     
   ]);
