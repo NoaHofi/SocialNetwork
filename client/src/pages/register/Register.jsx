@@ -49,10 +49,6 @@ const Register = () => {
                 <div className="left">
                     <h1>SportyNet.</h1>
                     <p>
-                        Welcome to SporyNet! 
-                        Connect with athletes, sports fans, 
-                        and fitness enthusiasts worldwide. 
-                        Share achievements, discuss games, and inspire others. 
                         Join us and celebrate the power of sports. 
                         Let's make every moment count!
                     </p>

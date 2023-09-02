@@ -68,11 +68,11 @@ const handleChange = (e) => {
           <h1>SportyNet</h1>
           <p>
             Welcome to SporyNet! 
-            Connect with athletes, sports fans, 
+            Connect with athletes, 
+            sports fans, 
             and fitness enthusiasts worldwide. 
-            Share achievements, discuss games, and inspire others. 
-            Join us and celebrate the power of sports. 
-            Let's make every moment count!
+            Share achievements, 
+            discuss games, and inspire others. 
           </p>
           <span>Don't you have an account?</span>
           <Link to="/register">
