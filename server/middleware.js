@@ -20,7 +20,7 @@ const verifyTokenAndAddUserInfo = (req, res, next) => {
     try {
         const userInfo = jwt.verify(token, secret);
         req.userInfo = userInfo; // Add userInfo to the request object
-        next(); // Continue to the next middleware or route handler
+        next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {
             console.error('Token verification failed:', error);

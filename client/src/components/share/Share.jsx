@@ -1,16 +1,13 @@
-import React, { useContext, useState, useRef,useEffect } from 'react';
+import React, { useState,useEffect } from 'react';
 import "./share.scss";
 import Image from "../../assets/img.png";
 import Map from "../../assets/map.png";
 import Friend from "../../assets/friend.png";
 import { makeRequest } from "../../axios";
-import { AuthContext } from "../../context/authContext";
 
 const Share = () => {
-  const { currentUser } = useContext(AuthContext);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [postText, setPostText] = useState('');
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     async function fetchUser() {
@@ -38,7 +35,6 @@ const Share = () => {
       });
       if (response.status === 201) {
         console.log(response.data.message);
-        // Reset the post text after successfully sharing
         setPostText('');
         window.location.reload();
       }

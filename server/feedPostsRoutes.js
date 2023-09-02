@@ -28,14 +28,10 @@ Router.post('/createPost',async (req, res) => {
 });
 
 // Get Post
-Router.get('/Posts',middleware.verifyTokenAndAddUserInfo, async (req, res) => {
-  console.log(0)
-  
+Router.get('/Posts',middleware.verifyTokenAndAddUserInfo, async (req, res) => {  
   try {
-
-    console.log(req.userInfo.id);
     const postData = await persist.getPostData(req.userInfo.id);
-    res.status(201).json({ postData });
+    res.status(200).json({ postData });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
         console.error('Token verification failed:', error);
@@ -48,10 +44,8 @@ Router.get('/Posts',middleware.verifyTokenAndAddUserInfo, async (req, res) => {
 
 // Edit Post
 Router.put('/editPost/:postId', async (req, res) => {
-  const { postId } = req.params; // Extract postId from URL parameter
-  const { newPostData } = req.body; // Extract newPostData from request body
-  console.log(postId)
-  console.log(newPostData)
+  const { postId } = req.params;
+  const { newPostData } = req.body;
   try {
     if (!newPostData) {
       return res.status(400).json({ message: 'New post data is required.' });
@@ -59,22 +53,24 @@ Router.put('/editPost/:postId', async (req, res) => {
 
     const editedPostId = await persist.editPostData(postId, newPostData); // Call the editPostData function
 
-    res.status(200).json({ message: `Post edited successfully. postID: ${editedPostId}` });
+    return res.status(200).json({ message: `Post edited successfully. postID: ${editedPostId}` });
   } catch (error) {
     console.error('Error editing post:', error);
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
 
+
+// Like posts
 Router.put('/likePost', async (req, res) => {
-  const { userID,postID } =  req.body; // Extract postId from URL parameter
+  const { userID,postID } =  req.body;
 
   try {
     if (!userID || !postID) {
       return res.status(400).json({ message: 'userID and postID are required.' });
     }
 
-    await persist.likePost(userID,postID); // Call the editPostData function
+    await persist.likePost(userID,postID);
 
     res.status(200).json({ message: `${userID} like post postID: ${postID}` });
   } catch (error) {
@@ -83,6 +79,7 @@ Router.put('/likePost', async (req, res) => {
   }
 });
 
+// Unlike posts
 Router.put('/unlikePost', async (req, res) => {
   const { userID, postID } = req.body;
 
@@ -101,7 +98,7 @@ Router.put('/unlikePost', async (req, res) => {
 });
 
 Router.get('/isLiked/:postID', middleware.verifyTokenAndAddUserInfo, async (req, res) => {
-  const userID = req.userInfo.id;  // Assuming you have some authentication middleware setting the user in req.
+  const userID = req.userInfo.id;
   const { postID } = req.params;
 
   try {

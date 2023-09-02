@@ -2,7 +2,7 @@ const Router = require("express").Router();
 const persist = require('./persist');
 
 
-// Admin Screen: Get Activity Log
+// Admin Page Get Activity Log
 Router.get('/activity-log',async (req, res) => {
     try {
         const allActivities = await persist.getAllActivityLog();
@@ -16,21 +16,20 @@ Router.get('/activity-log',async (req, res) => {
   
 
 
-// Admin Screen: Enable/Disable Additional Pages
+// Admin Page: Enable/Disable Additional Pages
 Router.put('/enable-disable/pages', async (req, res) => {
     const { pageID, enabled } = req.body;
 
   try {
     await persist.updatePageStatus(pageID, enabled);
-    res.status(200).json({ message: 'Page status updated successfully.' });
-    console.log("update succeed");
+    return res.status(200).json({ message: 'Page status updated successfully.' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while updating the page status.' });
+    return res.status(500).json({ error: 'An error occurred while updating the page status.' });
   }
 });
 
-// Admin Screen: Enable/Disable Additional Features
+// Admin Page: Enable/Disable Additional Features
 Router.put('/enable-disable/features', async (req, res) => {
     const { featureID, enabled } = req.body;
 
@@ -68,7 +67,7 @@ Router.get('/features', async (req, res) => {
     }
 });
 
-// Admin Screen: Remove User from the Social Network
+// Admin Page: Remove User from the Social Network
 Router.delete('/remove-user', async (req, res) => {
     const { username } = req.query;
   

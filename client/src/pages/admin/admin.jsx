@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { makeRequest } from "../../axios";  // assuming you have this setup
+import { makeRequest } from "../../axios";
 import "./admin.css";
 
 function Admin() {
@@ -9,13 +9,23 @@ function Admin() {
   const [features, setFeatures] = useState([]);
   const [usernameToRemove, setUsernameToRemove] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [fetchUserErr, setFetchUserErr] = useState(null);
+  const [fetchActivityLogErr, setFetchActivityLog] = useState(null);
+  const [fetchPagesErr, setFetchPagesErr] = useState(null);
+  const [fetchFeaturesErr, setFetchFeaturesErr] = useState(null);
 
+  
   useEffect(() => {
 
     async function fetchUser() {
         try {
           const response = await makeRequest.get('/userLogin/getLoggedInUser');
-          setLoggedInUser(response.data);
+          if (response.status === 200) {
+            setLoggedInUser(response.data);
+          }
+          else{
+            setFetchUserErr("Failed to fetch user.");
+          }
         } catch (error) {
           console.error('Error fetching the logged-in user:', error);
         } 
@@ -24,16 +34,33 @@ function Admin() {
     async function fetchData() {
       try {
         const activityResponse = await makeRequest.get('/admin/activity-log');
-        console.log("Activity Response: ", activityResponse);
-        setActivities(activityResponse.data.activities);
+        if (activityResponse.status === 200) {
+          console.log("Activity Response: ", activityResponse);
+          setActivities(activityResponse.data.activities);
+        }
+        else{
+          setFetchActivityLog("Failed to fetch activity log.");
+        }
+
 
         const pagesResponse = await makeRequest.get('/admin/pages');
-        console.log("Pages Response: ", pagesResponse);
-        setPages(pagesResponse.data.pages);
+        if (pagesResponse.status === 200) {
+          console.log("Pages Response: ", pagesResponse);
+          setPages(pagesResponse.data.pages);
+        }
+        else{
+          setFetchPagesErr("Failed to fetch pages.");
+        }
 
         const featuresResponse = await makeRequest.get('/admin/features');
-        console.log("Features Response: ", featuresResponse);
-        setFeatures(featuresResponse.data.features);
+        if (featuresResponse.status === 200) {
+          console.log("Features Response: ", featuresResponse);
+          setFeatures(featuresResponse.data.features);
+        }
+        else{
+          setFetchFeaturesErr("Failed to fetch features.");
+        }
+
       } catch (error) {
         console.error("Error fetching admin data:", error);
       }
@@ -73,7 +100,6 @@ function Admin() {
       if (res.status === 200) {
         setFeedbackMessage("User removed successfully.");
       } else {
-        // Optional: If there's a specific message from the server, you can display it.
         setFeedbackMessage(res.data.message || "Error removing user.");
       }
       
@@ -85,7 +111,6 @@ function Admin() {
 };
 
     if (loggedInUser === null) {
-    // You might want to return a loading message or spinner while the user data is being fetched
     return <div>Loading...</div>;
     }
 
@@ -96,10 +121,14 @@ function Admin() {
   return (
     <div className="admin-container">
       <div className="leftBar">
+      {fetchUserErr && <p className="error-message">{fetchUserErr}</p>}
+
+
 {/* Pages */}
 {pages && pages.length > 0 ? (
     <div className="item">
         <span>Disable & Enable Pages</span>
+        {fetchPagesErr && <p className="error-message">{fetchPagesErr}</p>}
         <ul>
             {pages.map(page => (
                 <li key={page.pageID} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -117,6 +146,7 @@ function Admin() {
 {features && features.length > 0 ? (
     <div className="item">
         <span>Features</span>
+        {fetchFeaturesErr && <p className="error-message">{fetchFeaturesErr}</p>}
         <ul>
             {features.map(feature => (
                 <li key={feature.featureID} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -152,6 +182,7 @@ function Admin() {
         {activities && activities.length > 0 ? (
             <div className="item">
                 <span>Latest Activities</span>
+                {fetchActivityLogErr && <p className="error-message">{fetchActivityLogErr}</p>}
                 {activities.map(activity => (
                     <div key={activity.activityID} className="user">
                         <div className="userInfo">

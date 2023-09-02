@@ -10,7 +10,6 @@ body {
     top: 70px;
     height: calc(100vh - 70px);
     overflow: scroll;
-    /* background-color will be dependent on the themed function */
   }
   
   .rightBar::-webkit-scrollbar {
@@ -27,7 +26,6 @@ body {
     box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
     padding: 20px;
     margin-bottom: 20px;
-    /* background-color will be dependent on the themed function */
   }
   
   .rightBar .container .item span {
@@ -65,25 +63,24 @@ body {
     left: 30px;
   }
   
-  /* .user .userInfo p and span colors will be dependent on the themed function */
   
   button {
     display: flex;
     align-items: center;
     gap: 10px;
     border: none;
-    padding: 10px 20px;  /* Increased padding for a more clickable area */
+    padding: 10px 20px; 
     color: white;
     cursor: pointer;
     background-color: #5271ff;
-    border-radius: 20px; /* More rounded */
-    transition: background-color 0.3s, transform 0.3s;  /* Smooth transition */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+    border-radius: 20px; 
+    transition: background-color 0.3s, transform 0.3s; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 
 button:hover {
-    background-color: #4158d0;  /* A slightly darker shade on hover */
-    transform: scale(1.05);  /* Slightly scale up the button */
+    background-color: #4158d0; 
+    transform: scale(1.05);
 }
 
 span {

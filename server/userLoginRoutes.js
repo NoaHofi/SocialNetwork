@@ -5,17 +5,15 @@ const expressJwt = require('express-jwt');
 const secret = require('./secret');
 const middleware = require('./Middleware');
 
-
+// validate the token for the remember me
 Router.post('/validateToken', (req, res, next) => {
-  console.log(req.headers);
-  console.log(req.cookies); // If you're using cookie-parser middleware
   next();
 }, middleware.jwtMiddleware, (req, res) => {
   res.status(200).json({ valid: true });
 });
 
 
-// User Registration
+// registration
 Router.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
@@ -54,10 +52,10 @@ Router.post('/login', async (req, res) => {
   const user = await persist.login(username,password);
   if (user) {
     const expirationDuration = rememberMe ? "10d" : "1h";
-    const cookieMaxAge = rememberMe ? 10 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000; // in milliseconds
+    const cookieMaxAge = rememberMe ? 10 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000;
     const token = jwt.sign({ id: user.userID }, secret, {
       algorithm: 'HS256',
-      expiresIn: expirationDuration // Optional: specify a duration for token expiration
+      expiresIn: expirationDuration
   });
     
     console.log('User login successfully.')
@@ -87,7 +85,7 @@ Router.post('/logout', async (req, res) => {
   }
   persist.logout(username);
   res.clearCookie("accessToken");
-  res.status(201).json({ message: 'User logout successfully.' });
+  res.status(200).json({ message: 'User logout successfully.' });
   } catch (error) {
     console.error('Error during Logout:', error);
     res.status(500).json({ message: 'Internal server error.' });
@@ -103,7 +101,7 @@ Router.get('/getLoggedInUser', middleware.verifyTokenAndAddUserInfo, async (req,
     console.log(req.userInfo.id);
     const username = await persist.getUsernameByUserID(req.userInfo.id);
     console.log(username)
-    res.status(201).json({ username: `${username}`, userID: req.userInfo.id });
+    return res.status(200).json({ username: `${username}`, userID: req.userInfo.id });
 } catch (error) {
     if (error.name === 'JsonWebTokenError') {
         console.error('Token verification failed:', error);
@@ -114,8 +112,9 @@ Router.get('/getLoggedInUser', middleware.verifyTokenAndAddUserInfo, async (req,
 }
 });
 
+// search users by prefix
 Router.get('/searchUser', async (req, res) => {
-  const username_prefix = req.query.username;  // get prefix from query params
+  const username_prefix = req.query.username;
 
   if (!username_prefix) {
       return res.status(400).send('Please provide a username prefix.');
@@ -129,7 +128,5 @@ Router.get('/searchUser', async (req, res) => {
       res.status(500).send('Internal Server Error');
   }
 });
-
-
 
 module.exports = Router;

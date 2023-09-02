@@ -1,11 +1,7 @@
 const express = require('express');
 const app = express();
-
-// Import required modules
 const cookieParser = require('cookie-parser');
 const secret = require('./secret');
-
-// Create an instance of Express
 
 // Middleware for parsing cookies and request bodies
 app.use(cookieParser());
@@ -23,7 +19,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-// Basic route for testing
+// Basic route
 app.get('/', (req, res) => {
   res.send('Welcome to the Social Network!');
 });
@@ -37,19 +33,5 @@ app.use("/admin", require("./adminRoutes"));
 const port = 8000;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-});
-
-// Search Users by prefix
-app.get('/users/search/:prefix', async(req, res) => {
-  const { prefix } = req.params;
-
-  try {
-    const usersAfterSearch = await users.searchUserByPrefix(prefix);
-
-    res.status(200).json({ users: usersAfterSearch });
-  } catch (error) {
-    console.error('Error searching users by prefix:', error);
-    res.status(500).json({ message: 'Internal server error.' });
-  }
 });
 

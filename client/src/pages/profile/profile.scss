@@ -4,9 +4,8 @@
   top: 70px;
   height: calc(100vh - 70px);
   overflow: scroll;
-  background-color: /* You'll have to replace this with the appropriate color from your theme */;
+  background-color: themed("bgSoft");
 
-  /* You mentioned mobile and tablet displays should not show this. If these were media queries in SCSS, you'll need to expand them manually in the CSS. */
   display: none;
 }
 
@@ -24,7 +23,6 @@
   box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
   padding: 20px;
   margin-bottom: 20px;
-  background-color: /* You'll have to replace this with the appropriate color from your theme */;
 }
 
 .rightBar .container .item span {
@@ -62,13 +60,9 @@
   left: 30px;
 }
 
-.rightBar .container .item .user .userInfo p {
-  color: /* You'll have to replace this with the appropriate color from your theme */;
-}
 
 .rightBar .container .item .user .userInfo span {
   font-weight: 500;
-  color: /* You'll have to replace this with the appropriate color from your theme */;
 }
 
 .rightBar .container .item .user .buttons {

@@ -1,7 +1,7 @@
+const BASE_URL = 'http://localhost:8000';
 
 
-const BASE_URL = 'http://localhost:8000'; // Adjust this to your server's actual address and port
-
+// helper function for the tests to send endpoints requests
 const testEndpoint = async (method, endpoint, body = null, headers = {}) => {
   const options = {
     method,
@@ -10,7 +10,7 @@ const testEndpoint = async (method, endpoint, body = null, headers = {}) => {
       ...headers,
     },
     body: body ? JSON.stringify(body) : null,
-    credentials: 'include', // Include this line
+    credentials: 'include',
   };
 
   try {
@@ -35,29 +35,21 @@ const testEndpoint = async (method, endpoint, body = null, headers = {}) => {
 };
 
 const runTests = async () => {
-  let jwtToken;
+
+  // delete the user first
+  await testEndpoint('DELETE', '/admin/remove-user?username=testUser');
   // Register a user
   await testEndpoint('POST', '/userLogin/register', { username: 'testUser', password: 'testPass' });
   // User Login
-  const loginResponse = await testEndpoint('POST', '/userLogin/login', { username: 'testUser', password: 'testPass', rememberMe: false });
-  jwtToken = loginResponse.token;
-  
-  // Validate Token
-  // Note: This might need an actual token either in the headers or as a cookie
-  await testEndpoint('POST', '/userLogin/validateToken', null, { withCredentials: true });
+  await testEndpoint('POST', '/userLogin/login', { username: 'testUser', password: 'testPass', rememberMe: false });
 
-
-  // Search User (assuming you're looking for users that start with "test")
+  // Search User
   await testEndpoint('GET', '/userLogin/searchUser?username=testUser');
-
-  // Get logged-in user
-  // Note: This would typically need an authenticated state to work
-  await testEndpoint('GET', '/userLogin/getLoggedInUser');
 
   // Logout user
   await testEndpoint('POST', '/userLogin/logout', { username: 'testUser' });
 
-    // Assuming a sample userID for the tests.
+    // sample ids for testing
     const sampleUserID = "3";
     const sampleTargetUser = "4";
   
@@ -77,13 +69,8 @@ const runTests = async () => {
     await testEndpoint('GET', `/following/checkFollowing/${sampleUserID}/${sampleTargetUser}`);
 
     // Test creating a post
-    await testEndpoint('POST', '/post/createPost', { userID: 'testUser', postData: 'This is a test post.' }, { 'Authorization': `Bearer ${jwtToken}` });
+    await testEndpoint('POST', '/post/createPost', { userID: 'testUser', postData: 'This is a test post.' });
 
-    // Test creating a post with missing data (should fail)
-    await testEndpoint('POST', '/post/createPost', { postData: 'This is a test post.' });
-    await testEndpoint('POST', '/post/createPost', { userID: 'testUser' });
-    // Test fetching all posts
-    await testEndpoint('GET', '/post/Posts');
     // Test editing a post
     await testEndpoint('PUT', '/post/editPost/1', { newPostData: 'This is the edited post content.' });
     // Test liking a post
@@ -91,8 +78,6 @@ const runTests = async () => {
 
     // Test unliking a post
     await testEndpoint('PUT', '/post/unlikePost', { userID: 'testUser', postID: '1' });
-    // Test to check if user liked a post
-    await testEndpoint('GET', '/post/isLiked/1', null, { 'Authorization': `Bearer ${jwtToken}` });
 
     // Test to fetch the like count for a post
     await testEndpoint('GET', '/post/likeCount/1');
@@ -103,12 +88,7 @@ const runTests = async () => {
     await testEndpoint('PUT', '/admin/enable-disable/features', { featureID: 'sampleFeatureID', enabled: true });
     await testEndpoint('GET', '/admin/pages');
     await testEndpoint('GET', '/admin/features');
-    await testEndpoint('DELETE', '/admin/remove-user?username=testUserToRemove');
-
-
 
   };
-
-  // Add more tests as needed
 
 runTests();

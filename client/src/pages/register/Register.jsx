@@ -10,16 +10,15 @@ const Register = () => {
     });
 
     const [message, setMessage] = useState('');
-    const [status, setStatus] = useState('none'); // Can be 'none', 'error', or 'success'
+    const [status, setStatus] = useState('none');
 
     const handleChange = (e) => {
         setInput(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent the default form submission behavior
+        e.preventDefault(); 
 
-        // Reset the status before attempting a new registration
         setStatus('none');
         setMessage('');
 

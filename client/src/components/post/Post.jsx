@@ -14,12 +14,22 @@ const Post = ({ post }) => {
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [isPostEditEnabled, setIsPostEditEnabled] = useState(false);
+  const [fetchUserErr, setFetchUserErr] = useState(null);
+  const [fetchFeaturesErr, setFetchFeaturesErr] = useState(null);
+  const [fetchEditPostFeatureErr, setFetchEditPostFeature] = useState(null);
+
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const response = await makeRequest.get('/userLogin/getLoggedInUser');
-        setLoggedInUser(response.data);
+        if (response.status === 200) {
+          setLoggedInUser(response.data);
+        }
+        else{
+          setFetchUserErr("Failed to fetch user.");
+        }
+        
       } catch (error) {
         console.error('Error fetching the logged-in user:', error);
       } 
@@ -28,10 +38,16 @@ const Post = ({ post }) => {
       const fetchFeatureStatus = async () => {
         try {
           const response = await makeRequest.get('/admin/features');
-          const unlikeFeature = response.data.features.find(f => f.featureName === "unlike post");  // Assuming each feature has a 'name' property
-          if (unlikeFeature) {
-            setIsEnabled(unlikeFeature.enabled);  // Assuming each feature has an 'enabled' property
+          if (response.status === 200) {
+            const unlikeFeature = response.data.features.find(f => f.featureName === "unlike post");
+            if (unlikeFeature) {
+              setIsEnabled(unlikeFeature.enabled); 
+            }
           }
+          else{
+            setFetchFeaturesErr("Failed to fetch features.");
+          }
+
         } catch (error) {
           console.error('Error fetching the feature status:', error);
         }
@@ -42,10 +58,16 @@ const Post = ({ post }) => {
      const fetchEditPostFeatureStatus = async () => {
       try {
         const response = await makeRequest.get('/admin/features');
-        const editFeature = response.data.features.find(f => f.featureName === "edit post");  // Assuming each feature has a 'name' property
-        if (editFeature) {
-          setIsPostEditEnabled(editFeature.enabled);  // Assuming each feature has an 'enabled' property
+        if (response.status === 200) {
+          const editFeature = response.data.features.find(f => f.featureName === "edit post"); 
+          if (editFeature) {
+            setIsPostEditEnabled(editFeature.enabled); 
+          }
         }
+        else{
+          setFetchEditPostFeature("Failed to fetch edit post feature.");
+        }
+
       } catch (error) {
         console.error('Error fetching the feature status:', error);
       }
@@ -53,14 +75,14 @@ const Post = ({ post }) => {
    
    
    const fetchLikeStatus = async () => {
-     // Placeholder
+     
      const response = await makeRequest.get(`/post/isLiked/${post.postID}`);
      setIsLiked(response.data.isLiked);
     };
     
     // Fetch like count
     const fetchLikeCount = async () => {
-      // Placeholder
+      
       const response = await makeRequest.get(`/post/likeCount/${post.postID}`);
       setLikeCount(response.data.likeCount);
     };  
@@ -75,8 +97,14 @@ const Post = ({ post }) => {
 
   const handleEditClick = () => {
     setIsEditing(true);
-    editInputRef.current.focus();
   };
+  
+  useEffect(() => {
+    if (isEditing && editInputRef.current) {
+      editInputRef.current.focus();
+    }
+  }, [isEditing]);
+  
 
   const handleSaveEdit = async () => {
     try {
@@ -132,6 +160,10 @@ const Post = ({ post }) => {
       <div className="container">
         <div className="user">
           <div className="userInfo">
+          {fetchUserErr && <p className="error-message">{fetchUserErr}</p>}
+          {fetchFeaturesErr && <p className="error-message">{fetchFeaturesErr}</p>}
+          {fetchEditPostFeatureErr && <p className="error-message">{fetchEditPostFeatureErr}</p>}
+          
             <div className="details">
               <span className="date">{post.createAt}</span>
             </div>
@@ -157,7 +189,7 @@ const Post = ({ post }) => {
           }
         </div>
         <div className="content">
-          <h4>{post.username}</h4> {/* Display the username */}
+          <h4>{post.username}</h4>
           {!isEditing && <p>{post.postData}</p>}
         </div>
         <div className="info">

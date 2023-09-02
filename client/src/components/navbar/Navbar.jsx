@@ -2,17 +2,12 @@ import "./navbar.scss";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Link ,useNavigate} from "react-router-dom";
 import { useState, useEffect,useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
-import { AuthContext } from "../../context/authContext";
 import ExitToAppOutlinedIcon from "@mui/icons-material/ExitToAppOutlined";
-import { makeRequest } from "../../axios";  // Assuming you have this axios config
+import { makeRequest } from "../../axios"; 
 
 
 const Navbar = () => {
@@ -20,18 +15,23 @@ const Navbar = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isUserFetched, setIsUserFetched] = useState(false);
   const navigate = useNavigate();
+  const [err, setErr] = useState(null);
+
 
   const logout = async (username) => {
     try {
       const response = await makeRequest.post('/userLogin/logout', { username: username });
-      if (response.status === 201) {
+      if (response.status === 200) {
         console.log(response.data.message);
-        // Optionally, clear any client-side state or data related to the user
         setLoggedInUser(null);
         navigate("/login");
       }
+      else{
+        setErr("Failed to logout.");
+      }
     } catch (error) {
       console.error('Error during Logout:', error);
+      setErr("Failed to logout.");
     }
   }
   
@@ -44,8 +44,6 @@ const Navbar = () => {
       } catch (error) {
         console.error('Error fetching the logged-in user:', error);
       } finally {
-        // This will be called after trying to fetch the user,
-        // regardless of success or failure
         setIsUserFetched(true);
       }
     }
@@ -81,7 +79,8 @@ const Navbar = () => {
            <span>{loggedInUser.username}</span>
            <ExitToAppOutlinedIcon onClick={() => logout(loggedInUser.username)} />
          </>)
-          :( <span>Loding..</span>)}
+          :( <span>Loading..</span>)}
+          {err && <p className="error-message">{err}</p>}
         </div>
       </div>
     </div>

@@ -1,6 +1,4 @@
 const Router = require("express").Router();
-
-
 const persist = require('./persist');
 
 // Get followers
@@ -70,7 +68,7 @@ Router.get('/allUsers', async (req, res) => {
   }
 });
 
-// The checkFollowing endpoint is optional and depends on your use case
+
 Router.get('/checkFollowing/:loggedInUserID/:targetUserID', async (req, res) => {
   try {
     const { loggedInUserID, targetUserID } = req.params;

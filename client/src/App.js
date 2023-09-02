@@ -13,11 +13,9 @@ import LeftBar from "./components/leftBar/LeftBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import "./style.scss";
-import { useContext, useEffect,useState} from "react";
+import { useContext, useEffect} from "react";
 import { DarkModeContext } from "./context/darkModeContext";
-import { AuthContext } from "./context/authContext";
 import { QueryClient , QueryClientProvider } from "react-query"; 
-import { makeRequest } from "./axios"; 
 
 function App() {
   const { darkMode } = useContext(DarkModeContext);
@@ -47,9 +45,6 @@ function App() {
   };
 
   const ProtectedRoute = ({ children, role }) => {
-  
-    
-    
     return children;
   };
   

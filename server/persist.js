@@ -1,4 +1,4 @@
-const knex = require('./knex'); // Import the knex connection from the knex.js file
+const knex = require('./knex');
 
 (async () => {
     const tableFollowerExists = await knex.schema.hasTable('follower');
@@ -6,7 +6,7 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
     if (!tableFollowerExists) {
         // Create a new 'post's' table
         await knex.schema.createTable('follower', (table) => {
-        table.increments('id').primary(); // Use 'id' as primary key
+        table.increments('id').primary();
         table.integer('userID').notNullable();
         table.integer('followBy').notNullable();
         });
@@ -55,7 +55,7 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
         await knex.schema.createTable('activityLog', (table) => {
         table.increments('activityID').primary();
         table.string('activityAction').notNullable();
-        table.timestamp('timeStamp').defaultTo(knex.fn.now()); // Use timestamp type and default value
+        table.timestamp('timeStamp').defaultTo(knex.fn.now());
         });
         console.log('activityLog table created.');
     }
@@ -66,8 +66,8 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
     if (!postsTableExists) {
         // Create a new 'post's' table
         await knex.schema.createTable('posts', (table) => {
-        table.increments('postID').primary(); // Use only postID as primary key
-        table.integer('userID').notNullable(); // Add userID column
+        table.increments('postID').primary();
+        table.integer('userID').notNullable();
         table.string('postData').notNullable();
         table.timestamp('createdAt').defaultTo(knex.fn.now());
         });
@@ -79,8 +79,8 @@ const knex = require('./knex'); // Import the knex connection from the knex.js f
     {
         // Create a new 'like's' table
         await knex.schema.createTable('likes', (table) => {
-        table.increments('id').primary(); // Use only postID as primary key
-        table.integer('userID').notNullable(); // Add userID column
+        table.increments('id').primary();
+        table.integer('userID').notNullable();
         table.integer('postID').notNullable();
         });
         console.log('Like table created.');
@@ -114,7 +114,7 @@ async function searchUserByPrefix(username_prefix) {
     }
   }
   
-  // Helper functions for database operations
+
   async function isUserExist(username) {
     try {
       console.log(`username: ${username}`);
@@ -123,7 +123,7 @@ async function searchUserByPrefix(username_prefix) {
         .where('username', username)
         .first();
       
-      const isExist = !!user; // Convert user object to boolean (true if user exists, false if not)
+      const isExist = !!user;
       console.log(`isExist: ${isExist}`);
       return isExist;
     } catch (error) {
@@ -157,7 +157,7 @@ async function searchUserByPrefix(username_prefix) {
       });
       
       console.log(`User inserted with ID: ${userId}`);
-      return userId; // Return the inserted user's ID
+      return userId;
     } catch (error) {
       console.error('Error in insertUser:', error);
       throw error;
@@ -181,14 +181,14 @@ async function searchUserByPrefix(username_prefix) {
         throw new Error('Incorrect password.');
       }
   
-      // Password is correct, update isLogin to true in a transaction
+      
       await knex.transaction(async (trx) => {
         await trx('users')
           .where('username', username)
           .update('isLogin', true);
       });
         insertActivity(`User ${username} successfully login`)
-      return user; // Login successful
+      return user;
     } catch (err) {
       console.error('Error during login:', err.message);
       throw new Error('Login failed.');
@@ -207,14 +207,14 @@ async function searchUserByPrefix(username_prefix) {
         throw new Error('User not found.');
       }
   
-      // Update isLogin to false in a transaction
+      
       await knex.transaction(async (trx) => {
         await trx('users')
           .where('username', username)
           .update('isLogin', false);
       });
         insertActivity(`User ${username} successfully logged out`);
-      return true; // Logout successful
+      return true;
     } catch (err) {
       console.error('Error during logout:', err.message);
       throw new Error('Logout failed.');
@@ -223,7 +223,6 @@ async function searchUserByPrefix(username_prefix) {
   
   async function removeUserFromDB(username) {
     try {
-      // Delete the user
       await knex('users').where('username', username).del();
       console.log("user"+ username + "has been remvoed")
     } catch (error) {
@@ -241,7 +240,7 @@ async function searchUserByPrefix(username_prefix) {
         .first();
       
       console.log(`isLoggedin: ${!!user}`);
-      return !!user;  // This will convert the result to a boolean. If user exists, it will return true. Otherwise, false.
+      return !!user; 
     } catch (error) {
       console.error('Error in isLogin:', error);
       throw error;
@@ -308,11 +307,11 @@ async function follow(userID, followBy) {
   
       if (numDeleted === 0) {
         console.log('No follower data deleted.');
-        return null; // Return null or throw an error based on your preference
+        return null;
       }
   
       console.log('Follower data deleted for user:', userID);
-      return numDeleted; // Return the number of deleted rows
+      return numDeleted;
     } catch (error) {
       console.error('Error unfollowing user:', error);
       throw error;
@@ -322,7 +321,6 @@ async function follow(userID, followBy) {
   // Get followers 
   async function getFollowers(userID) {
     try {
-      // Check if userID exists in the users table
       const userExists = await knex('users').where({ userID }).first();
   
       if (!userExists) {
@@ -354,27 +352,24 @@ async function follow(userID, followBy) {
       followBy: loggedInUserID
     }).first();
   
-    return !!result; // returns true if following, otherwise false
+    return !!result;
   };
 
-// Get all the post that made by the people the userID follow sorted by insertion time
 async function getPostData(userID) {
     try {
-        // Fetch the IDs of users this user is following
+
         const followedIDs = await knex('follower')
             .where('follower.userID', userID)
             .select('followBy');
   
-        // Extract IDs and add the user's own ID
         const userIDs = followedIDs.map(follow => follow.followBy);
         userIDs.push(userID);
   
-        // Now fetch the posts using the IDs list
         const posts = await knex('posts')
             .join('users', 'users.userID', '=', 'posts.userID')
             .select('posts.postID', 'posts.postData', 'posts.createdAt', 'posts.userID', 'users.username')
             .whereIn('posts.userID', userIDs)
-            .orderBy('posts.createdAt', 'desc'); // Order by insertion time in descending order
+            .orderBy('posts.createdAt', 'desc');
   
         return posts;
     } catch (error) {
@@ -384,7 +379,6 @@ async function getPostData(userID) {
   }
   
   
-  // Function to Save Post Data
   async function savePostData(userID,postData) {
     try {
       const [postId] = await knex('posts').insert({
@@ -452,7 +446,7 @@ async function getPostData(userID) {
         })
         .first();
   
-      return !!result;  // Returns true if there's a result, otherwise false
+      return !!result;
     } catch (error) {
       console.error('Error checking if user liked post:', error);
       throw error;
@@ -465,9 +459,9 @@ async function getPostData(userID) {
         .where({
           postID: postID,
         })
-        .count('postID as likeCount');  // Count rows matching the postID
+        .count('postID as likeCount');
   
-      return count[0].likeCount;  // Return the count
+      return count[0].likeCount;
     } catch (error) {
       console.error('Error fetching like count:', error);
       throw error;

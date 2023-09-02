@@ -7,12 +7,15 @@ function Profile() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
+
   useEffect(() => {
     async function fetchUser() {
       try {
         const response = await makeRequest.get('/userLogin/getLoggedInUser');
-        setLoggedInUser(response.data);
-        console.log(loggedInUser)
+        if (response.status === 200) {
+          setLoggedInUser(response.data);
+          console.log(loggedInUser)
+        }
       } catch (error) {
         console.error('Error fetching the logged-in user:', error);
       }
@@ -41,12 +44,13 @@ function Profile() {
       />
       <button onClick={handleSearch}>Search</button>
       <ul>
-        {loggedInUser && searchResults.map((user) => (
-          <li className="item">
-            <UserItem key={user.userID} user={user} loggedInUserID={loggedInUser.userID} />
-          </li>
-        ))}
+          {loggedInUser && searchResults.map((user) => (
+            <li className="item" key={user.userID}>
+              <UserItem user={user} loggedInUserID={loggedInUser.userID} />
+            </li>
+          ))}
       </ul>
+
     </div>
   </div>
   );
