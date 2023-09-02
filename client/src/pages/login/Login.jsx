@@ -30,7 +30,7 @@ const handleChange = (e) => {
             });
 
               if (response.data.valid) {
-                  navigate('/');
+                  navigate('/home');
               }
             
         } catch (error) {

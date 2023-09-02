@@ -61,6 +61,11 @@ function App() {
       children: [
         {
           path: "/",
+          index: true,
+          element: <Navigate to="/login" />
+        },
+        {
+          path: "/home",
           element: <Home />,
         },
         {
